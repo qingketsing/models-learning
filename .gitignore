@@ -1,0 +1,38 @@
+# Python environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Downloaded datasets, model weights and experiment output
+/data/
+/datasets/
+/checkpoints/
+/outputs/
+/runs/
+/wandb/
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.log
+
+# Local credentials and machine-specific files
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Keep pyproject.toml, uv.lock and .python-version under version control.
