@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="沿着真实数值计算探索 Transformer：可点击矩阵、逐项推导、因果验证、多头切换与输出头训练。"><title>Transformer Lab · 把每一个数字算清楚</title><style>
+:root{--bg:#f3f4f0;--paper:#fff;--ink:#1c2b30;--muted:#687c80;--line:#dfe5e1;--green:#246959;--green-pale:#edf5ef;--accent:#df7244;--orange-pale:#fff1e8;--sidebar:#192b2c;--blue:#537996;--shadow:0 5px 18px #12292307;--mono:ui-monospace,SFMono-Regular,Consolas,'Liberation Mono',monospace}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;font-size:14px;line-height:1.7}button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #df7244;outline-offset:3px}button{transition:background .15s,box-shadow .15s,transform .15s}a{color:var(--green);text-underline-offset:3px}button:disabled{cursor:not-allowed;opacity:.4}.mono,code,.matrix td,.calc-line,.big-number{font-family:var(--mono)}.sidebar{position:fixed;left:0;top:0;bottom:0;width:226px;background:var(--sidebar);color:#d3ddda;padding:28px 17px 16px;display:flex;flex-direction:column;z-index:30}.brand{display:flex;gap:11px;align-items:center;padding:0 10px 24px}.brand-mark{display:grid;grid-template-columns:repeat(3,5px);gap:3px;transform:rotate(-8deg)}.brand-mark i{width:5px;height:5px;border-radius:1px;background:#daee9e}.brand-mark i:nth-child(3n){background:var(--accent)}.brand strong{color:white;font-size:17px;letter-spacing:-.5px}.brand small{display:block;color:#8ca29b;font-size:10px;letter-spacing:2px}.nav-label{font-size:10px;letter-spacing:2px;padding:11px 12px;color:#839b94}.nav{overflow:auto;scrollbar-width:thin;scrollbar-color:#425a53 transparent;flex:1}.nav button{width:100%;background:transparent;border:0;text-align:left;padding:10px 11px;color:#bdcbc5;border-radius:7px;display:flex;align-items:center;gap:11px;font-size:12px;line-height:1.4;margin:2px 0}.nav button:hover{background:#ffffff09;color:white}.nav button.active{background:#e5edcf;color:#203a30}.nav-num{font-family:var(--mono);font-size:11px;opacity:.55;width:18px}.nav button.active .nav-num{opacity:1;color:#50783c}.nav b{font-weight:550}.nav-footer{border-top:1px solid #345048;margin-top:12px;padding:16px 11px 0;font-size:11px;color:#95aaa2}.nav-footer strong{color:#d9e3da;display:block;font-family:var(--mono);font-weight:500;margin-bottom:7px}.status-dot{width:6px;height:6px;background:#bed78f;border-radius:50%;display:inline-block;margin-right:7px}.workspace{margin-left:226px;min-height:100vh}.topbar{height:72px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 32px;background:#f8f9f5;gap:16px}.crumb{font-size:12px;color:var(--muted);letter-spacing:.2px}.crumb b{color:var(--ink);font-weight:500;margin-left:7px}.tools{display:flex;gap:8px;align-items:center}.btn{background:white;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:7px 12px;font-size:12px;line-height:1.6;display:inline-flex;align-items:center;justify-content:center;gap:7px}.btn:hover{background:#edf3ec;border-color:#aebfb3}.btn.primary{background:var(--green);border-color:var(--green);color:white}.btn.primary:hover{background:#1b5546}.btn.orange{background:var(--accent);border-color:var(--accent);color:#fff}.btn.subtle{background:transparent;border-color:transparent;color:var(--muted)}.btn.small{font-size:11px;padding:4px 8px}.kbd{font:10px var(--mono);padding:2px 4px;border:1px solid var(--line);border-radius:3px;color:var(--muted)}.main-inner{padding:26px 32px 30px;max-width:1860px;margin:auto}.lab-toolbar{background:var(--paper);border:1px solid var(--line);border-radius:10px;display:flex;align-items:center;gap:15px;flex-wrap:wrap;padding:13px 17px;box-shadow:var(--shadow);margin-bottom:26px}.toolbar-label{font-size:10px;letter-spacing:1.5px;color:var(--muted);line-height:1.6}.toolbar-label b{font-size:12px;letter-spacing:0;color:var(--ink);display:block}.token-controls{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.token-control{position:relative}.token-control select{appearance:none;padding:7px 26px 7px 10px;border:1px solid var(--line);border-radius:5px;background:#f7f8f5;color:var(--ink);font-size:12px;max-width:98px}.token-control:after{content:'⌄';position:absolute;right:9px;top:5px;pointer-events:none;color:var(--muted)}.token-control.focused select{border-color:#e5a489;background:var(--orange-pale)}.token-control label{position:absolute;top:-9px;left:6px;background:white;color:#a17a69;font:9px var(--mono);padding:0 3px}.toolbar-sep{width:1px;height:30px;background:var(--line);margin:0 3px}.toolbar-select{border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-size:11px;background:#fff;max-width:150px}.live-pill{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:11px;color:var(--green);white-space:nowrap}.live-pill .status-dot{background:#6b9c72;margin:0}.stage-head{display:flex;justify-content:space-between;gap:24px;margin-bottom:23px;align-items:flex-start}.eyebrow{font-size:10px;font-weight:600;letter-spacing:2px;color:var(--green);margin-bottom:9px;display:flex;align-items:center;gap:9px}.eyebrow span{background:#e5eddf;padding:2px 7px;border-radius:3px;letter-spacing:1px}.stage-head h1{font-size:29px;line-height:1.35;margin:0 0 10px;letter-spacing:-.9px;font-weight:650}.stage-head p{color:var(--muted);max-width:760px;margin:0;font-size:13px;line-height:1.9}.stage-counter{padding-top:21px;text-align:right;font:12px var(--mono);color:#8a9993;white-space:nowrap}.stage-counter strong{font-size:22px;font-weight:400;color:var(--green)}.content-grid{display:grid;grid-template-columns:minmax(0,1fr) 322px;gap:20px;align-items:start}.stage-content{min-width:0}.card{background:white;border:1px solid var(--line);border-radius:10px;box-shadow:var(--shadow);padding:21px 23px;margin-bottom:18px;overflow:hidden}.card-title{font-size:14px;font-weight:650;display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 12px}.card-title small{font-weight:400;color:var(--muted);font-size:11px}.card p{font-size:12px;color:var(--muted);margin:8px 0 12px;line-height:1.9}.card h3{font-size:13px;margin:20px 0 8px}.card h3:first-child{margin-top:0}.formula{background:#f5f7f2;border:1px solid #e5eadf;border-radius:7px;padding:13px 16px;color:#294b3e;font-family:var(--mono);font-size:13px;line-height:1.9;overflow-x:auto;margin:12px 0}.formula .tag{font-family:inherit;font-size:10px;opacity:.6;margin-left:10px}.callout{border-left:3px solid var(--accent);padding:10px 13px;background:var(--orange-pale);border-radius:0 5px 5px 0;font-size:12px;color:#835839;line-height:1.85;margin:14px 0}.callout.green{background:var(--green-pale);color:#345b47;border-color:#82a871}.callout strong{color:inherit}.flow-intro{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:15px}.flow-intro h2{margin:0;font-size:16px;font-weight:600}.chip{display:inline-flex;align-items:center;padding:3px 8px;border-radius:4px;background:#f0f3ec;color:#61725c;font:10px var(--mono);white-space:nowrap}.chip.orange{background:var(--orange-pale);color:#ac5c38}.chip.blue{background:#edf2f6;color:#58728a}.flow-start{display:flex;justify-content:center;gap:9px;align-items:center;padding:11px 0 14px}.token{border:1px solid #d9e1d7;border-radius:6px;background:#f9faf6;min-width:70px;text-align:center;padding:8px 12px;font-size:13px}.token small{display:block;font:10px var(--mono);color:#849484;margin-top:3px}.flow-arrow{color:#95a28b;text-align:center;line-height:1.5;font-size:16px}.flow-block{padding:17px 16px 13px;border:1px dashed #abbfa2;border-radius:8px;background:#fbfcf8;position:relative;margin:7px 0 13px}.flow-block-label{position:absolute;top:-10px;left:15px;background:#fbfcf8;padding:0 7px;font:10px var(--mono);color:#65815d;letter-spacing:1px}.flow-row{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0 0 10px}.flow-node{display:flex;align-items:center;gap:9px;border:1px solid #dce4d5;background:white;border-radius:6px;padding:10px 12px;text-align:left;min-width:0;color:var(--ink);position:relative}.flow-node:hover{border-color:#759564;box-shadow:0 3px 8px #344d1310;transform:translateY(-1px)}.flow-node .node-icon{width:25px;height:25px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:5px;background:#eef3e7;color:#648749;font:12px var(--mono)}.flow-node b{font-size:12px;font-weight:550;display:block;line-height:1.5}.flow-node small{font:10px var(--mono);color:#889480;display:block;margin-top:2px}.flow-node .node-go{margin-left:auto;color:#8d9b80;font-size:13px}.flow-node.orange{background:#fff7f0;border-color:#eacbb5}.flow-node.orange .node-icon{background:#fbe6d8;color:#b47349}.bypass-line{margin:-4px 4px 10px 0;text-align:right;color:#7e926f;font:10px var(--mono);padding:5px 9px;border-right:2px solid #b7c6a4;border-bottom:2px solid #b7c6a4;border-radius:0 0 7px 0;max-width:96%}.mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:14px 0}.stat{background:#f7f8f3;border:1px solid #e5e9df;border-radius:7px;padding:12px}.stat .number{font:21px var(--mono);color:#41634a;line-height:1.3}.stat .label{font-size:10px;color:#85917e;margin-top:5px}.matrix-row{display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;margin:16px 0 6px}.matrix-wrap{max-width:100%;overflow:auto;padding-bottom:5px;flex-shrink:0}.matrix-head{display:flex;justify-content:space-between;align-items:center;gap:10px;font:12px var(--mono);color:#2c5544;margin-bottom:9px}.matrix-head .shape{font-size:10px;color:#8d9b8a;background:#f4f6ef;padding:2px 5px;border-radius:3px}.matrix{border-collapse:separate;border-spacing:4px;line-height:1.2}.matrix thead th{font:9px var(--mono);color:#859283;font-weight:400;text-align:center;padding:0 2px 3px;max-width:60px}.matrix tbody th{font-size:10px;font-weight:400;color:#859283;padding-right:5px;white-space:nowrap}.matrix td{padding:0;font-size:11px}.cell{min-width:51px;min-height:36px;border-radius:4px;border:1px solid transparent;display:block;font:11px var(--mono);padding:7px 5px;color:#344a40;width:100%;font-variant-numeric:tabular-nums}.cell:hover{outline:1px solid #df7244;outline-offset:1px;z-index:1;position:relative}.cell.selected{outline:2px solid var(--accent);outline-offset:1px;box-shadow:0 0 0 4px #df724413;position:relative;z-index:2}.cell.related{border-color:#85a276;box-shadow:inset 0 0 0 1px #85a276}.cell.masked{background:repeating-linear-gradient(135deg,#f4f4f0,#f4f4f0 5px,#ebeeea 5px,#ebeeea 6px)!important;color:#99a095}.matrix .focus-row th{color:#b46a45;font-weight:600}.operator{font-size:21px;color:#b1b8a7;align-self:center;padding-top:20px}.matrix-help{font-size:10px;color:#96a18c;margin-top:9px;display:flex;justify-content:space-between;gap:8px;align-items:center}.swatch{display:inline-block;width:8px;height:8px;border-radius:2px;vertical-align:middle;margin-right:4px}.split-2{display:grid;grid-template-columns:1fr 1fr;gap:15px}.control-row{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:8px 0}.control-row label{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:9px}.control-row input[type=range]{width:130px;accent-color:var(--green)}input[type=checkbox]{accent-color:var(--green)}.control-row output{font:12px var(--mono);color:var(--green);min-width:28px}.switch{display:flex;align-items:center;gap:8px;cursor:pointer;font-size:12px}.segmented{display:inline-flex;padding:3px;border-radius:6px;background:#f0f3eb;border:1px solid #e2e8da;gap:3px}.segmented button{background:transparent;border:0;font-size:11px;color:#829078;padding:4px 10px;border-radius:4px}.segmented button.active{background:white;color:#3f633f;box-shadow:0 1px 3px #28361c10}.inspector{position:sticky;top:18px;min-width:0;background:#fff;border:1px solid #dbe1d5;border-radius:10px;overflow:hidden;box-shadow:var(--shadow)}.inspector-top{padding:15px 19px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;background:#fcfdf9}.inspector-top .icon{color:var(--accent);font:16px var(--mono)}.inspector-top small{margin-left:auto;font:9px var(--mono);color:#a1ad96;letter-spacing:1px}.inspector-body{padding:18px 19px;max-height:calc(100vh - 95px);overflow:auto;scrollbar-width:thin}.inspect-label{font:11px var(--mono);color:#758468;display:flex;gap:7px;align-items:center;flex-wrap:wrap}.inspect-label .op-type{font:9px var(--mono);padding:1px 5px;background:#f1f4eb;border-radius:3px;color:#8a997a}.big-number{font-size:31px;color:#3b5b39;line-height:1.2;margin:12px 0 9px;letter-spacing:-1px}.inspect-note{font-size:11px;line-height:1.8;color:#8a957f;margin:0 0 18px}.deriv-section{border-top:1px solid #e9ede3;padding-top:13px;margin-top:14px}.deriv-title{font-size:11px;font-weight:600;color:#687e55;margin-bottom:8px;display:flex;align-items:center;gap:7px}.deriv-title .dot{display:block;width:15px;height:15px;border-radius:50%;background:#eef2e7;font:9px/15px var(--mono);text-align:center;color:#7b8f65}.calc-line{font-size:11px;color:#5c6a56;padding:5px 0;line-height:1.8;overflow-wrap:anywhere}.calc-line .term{display:block;padding:2px 0}.calc-line strong{color:#b16740;font-weight:500}.calc-box{background:#f6f7f1;padding:10px 11px;border-radius:5px;font:11px/1.9 var(--mono);color:#627056;overflow-wrap:anywhere}.calc-result{border-top:1px solid #dfe5d8;padding-top:9px;margin-top:7px;color:#49653e;font:12px var(--mono)}.param-input{width:100%;background:#f9faf5;border:1px solid #d7e0cd;border-radius:5px;padding:9px;color:#49643a;font:14px var(--mono);margin:8px 0}.dep-buttons{display:flex;gap:5px;flex-wrap:wrap;margin-top:10px}.dep{border:1px solid #e1e6d9;color:#687c54;background:white;border-radius:4px;font:10px var(--mono);padding:5px 7px}.dep:hover{background:#eff4e8}.inspector-foot{font-size:10px;color:#96a18b;padding-top:14px;margin-top:15px;border-top:1px solid #e7ebdf;line-height:1.8}.info-table{width:100%;border-collapse:collapse;font-size:11px}.info-table th{text-align:left;color:#8b9882;font-weight:400;padding:9px 8px;border-bottom:1px solid #e2e8d9}.info-table td{padding:10px 8px;border-bottom:1px solid #eef0e9;color:#65735a;vertical-align:top}.info-table tr:last-child td{border-bottom:0}.info-table .mono{color:#446035}.sankey{margin:10px 0;max-width:100%;height:auto;width:100%}.sankey text{font-size:13px;fill:#4d6547;font-family:inherit}.sankey .value-label{font:11px var(--mono);fill:#8a967e}.prob-row{display:grid;grid-template-columns:53px 1fr 53px;align-items:center;gap:12px;margin:10px 0;font-size:12px}.bar-bg{background:#edf1e7;height:18px;border-radius:3px;overflow:hidden}.bar-fill{height:100%;background:#789d60;border-radius:3px;min-width:1px;transition:width .3s}.prob-row.winner .bar-fill{background:var(--accent)}.prob-row .prob-number{font:11px var(--mono);color:#738465;text-align:right}.prob-row .label{color:#6a7c5e}.prob-row.winner .label{color:#b3673e}.bars-caption{font-size:10px;color:#93a084;margin-top:9px}.train-example{display:flex;gap:5px;align-items:center;padding:9px;border:1px solid #e4e9dc;background:#fafbf7;border-radius:6px;font-size:12px;color:#748465;margin:7px 0;flex-wrap:wrap}.train-example .target{color:#b8754b;background:#fff0e3;padding:3px 10px;border-radius:4px}.training-status{display:flex;gap:15px;align-items:center;font:11px var(--mono);color:#7f8e70;margin:10px 0}.progressline{height:3px;background:#e3e8db;margin:0 0 20px;overflow:hidden;border-radius:5px}.progressline div{height:3px;background:#91ab7e;transition:width .25s}.step-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:17px;border-top:1px solid var(--line);gap:12px}.step-footer .hint{font-size:10px;color:#8c9a7f}.ref{font-size:10px;color:#94a188;margin:14px 0 0;line-height:1.8}.ref a{color:#708b5b;text-decoration:underline}.ref .ref-tag{padding:1px 4px;background:#eff3e8;border-radius:2px;font:9px var(--mono);margin-right:5px}.collapsible{border:1px solid #e0e6d7;border-radius:6px;margin:13px 0;overflow:hidden}.collapsible summary{padding:11px 13px;background:#fafbf7;cursor:pointer;font-size:12px;color:#688153}.collapsible .inside{padding:10px 13px}.codeblock{white-space:pre;overflow:auto;background:#1c302e;border-radius:7px;color:#c6d7bf;padding:16px;font:11px/1.9 var(--mono);tab-size:4}.pill-list{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}.mini-heading{font-size:11px;font-weight:550;color:#70855e;margin:18px 0 8px}.mobile-menu{display:none}.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);padding:11px 18px;background:#233e32;color:#e5eddf;font-size:12px;border-radius:7px;box-shadow:0 5px 22px #12271830;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw}.toast.show{opacity:1}.route-select{font-size:11px;border:1px solid var(--line);border-radius:4px;background:white;padding:4px}.attention-footer{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:8px 0}.focus-buttons{display:flex;gap:5px;flex-wrap:wrap}.focus-buttons button{font-size:11px;padding:4px 10px;border-radius:5px;border:1px solid var(--line);background:#fff;color:#7c8c70}.focus-buttons button.active{border-color:#d8a787;background:var(--orange-pale);color:#b57146}.comparison-value{font-family:var(--mono);font-size:11px;color:#4c6b3b}.success{color:#4f7f45!important}.warning{color:#b87543!important}.learn-check{background:#f6f8f1;border:1px solid #e2e8d8;border-radius:7px;padding:13px 15px;font-size:12px;line-height:1.9;color:#697d58;margin-top:14px}.learn-check strong{font-size:10px;letter-spacing:1px;color:#8a9d77;display:block;margin-bottom:4px}.reveal{background:none;border:0;color:#9b704a;text-decoration:underline;text-underline-offset:3px;padding:0;font-size:11px}.legend-label{font:10px var(--mono);fill:#8a977c}.training-graph{width:100%;max-height:160px}.flow-line{padding:6px 0}.param-note{font-size:10px;color:#94a087}.reference-list a{font-size:12px;display:block;margin:11px 0;color:#5c7a48}.reference-list small{display:block;color:#96a287;font-size:10px}.source-code-title{display:flex;align-items:center;justify-content:space-between}.empty-state{padding:18px;text-align:center;color:#869579;font-size:12px}.note-inline{font-size:11px;color:#899980}.tiny-label{font:9px var(--mono);letter-spacing:1px;color:#86987a}.legend-strip{display:flex;align-items:center;gap:13px;font-size:10px;color:#8a9a7c;margin-top:13px;flex-wrap:wrap}body.precise .cell{font-size:10px;min-width:61px}.takeaway{border-radius:8px;background:#243d31;padding:18px 20px;color:#d5e3ca;margin:16px 0}.takeaway strong{display:block;font-size:13px;color:#e8f0e0;margin-bottom:6px}.takeaway p{color:#afc4a3;font-size:12px;margin:0}.link-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.learn-card{padding:15px;border:1px solid #e3e8da;border-radius:7px;background:#fafbf7}.learn-card b{font-size:12px;color:#547044}.learn-card p{font-size:11px;margin:8px 0}.scroll-table{overflow:auto}.param-tag{font:9px var(--mono);color:#a47959;background:#fff3e8;padding:2px 5px;border-radius:3px}.shape-path{font:12px/2 var(--mono);color:#6c815a;background:#f6f8f1;padding:10px 12px;border-radius:5px;overflow:auto;white-space:nowrap}.head-legend{display:flex;gap:12px;font-size:10px;color:#88997a;margin-bottom:5px}input[type=number]{max-width:100%}.objective{font:10px var(--mono);letter-spacing:1px;color:#9aa78b;margin-bottom:8px}.term-var{color:#b3724a} @media(min-width:1700px){.content-grid{grid-template-columns:minmax(0,1fr) 365px}.cell{min-width:57px;min-height:40px}.card{padding:25px 27px}.stage-head h1{font-size:33px}}@media(max-width:1270px){.sidebar{width:197px;padding-left:10px;padding-right:10px}.workspace{margin-left:197px}.main-inner{padding:23px 20px}.topbar{padding:0 20px}.content-grid{grid-template-columns:minmax(0,1fr) 280px;gap:15px}.card{padding:18px}.inspector-body{padding:16px}.cell{min-width:47px}.stage-head h1{font-size:27px}.live-pill{display:none}.flow-node{padding:9px}.split-2{grid-template-columns:1fr}.toolbar-sep{display:none}.mini-stats{gap:6px}.stat{padding:9px}}@media(max-width:1000px){.content-grid{grid-template-columns:1fr}.inspector{position:static}.inspector-body{max-height:none;display:block}.flow-row{grid-template-columns:1fr 1fr}.split-2{grid-template-columns:1fr 1fr}.inspector{margin-top:5px}.stage-counter{display:none}.topbar{gap:7px}.crumb{font-size:11px}.tools .btn{font-size:11px;padding:6px 9px}}@media(max-width:720px){.sidebar{transform:translateX(-100%);transition:transform .2s;width:226px}.sidebar.open{transform:translateX(0);box-shadow:5px 0 100px #0005}.workspace{margin-left:0}.mobile-menu{display:inline-flex}.main-inner{padding:17px 13px}.topbar{padding:0 13px;height:62px}.crumb{display:none}.tools{margin-left:auto}.tools .export-label{display:none}.stage-head h1{font-size:25px}.stage-head p{font-size:12px}.lab-toolbar{padding:14px 12px;gap:11px;margin-bottom:20px}.card{padding:16px}.flow-row{grid-template-columns:1fr}.flow-node{padding:10px 13px}.split-2,.link-grid{grid-template-columns:1fr}.matrix-row{gap:11px}.cell{min-width:46px}.mini-stats{grid-template-columns:repeat(2,1fr)}.token{min-width:59px}.step-footer .hint{display:none}.stage-head{margin-bottom:17px}.toolbar-label{display:none}.content-grid{gap:10px}.toolbar-select{max-width:140px}.lab-toolbar .btn.small{font-size:10px}.flow-start{flex-wrap:wrap}.flow-row .flow-node:last-child:nth-child(odd){grid-column:auto}.matrix-help{flex-wrap:wrap}.info-table{font-size:10px}.info-table td{padding:9px 5px}.inspector-top{padding:13px 16px}.source-code-title{flex-wrap:wrap;gap:8px}.shape-path{font-size:11px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+/* Reading comfort for dense numerical derivations. */
+.card p{font-size:13px}.inspect-note{font-size:12px;color:#74826c}.calc-line,.calc-box{font-size:12px}.cell{font-size:12px;min-width:53px}.matrix thead th{font-size:10px;color:#79876f}.matrix tbody th{color:#79876f}.inspector-foot{color:#7c8b70}.flow-row{position:relative}.flow-node:not(:last-child)::after{content:""}body.precise .cell{font-size:11px}.mobile-json{display:none}@media(max-width:720px){.cell{min-width:48px;font-size:11px}.mobile-json{display:inline}}
+
+</style></head>
+<body>
+<aside class="sidebar" id="sidebar"><div class="brand"><div class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><div><strong>Transformer Lab</strong><small>COMPUTATION, REVEALED</small></div></div><nav class="nav" id="nav" aria-label="学习步骤"></nav><div class="nav-footer"><strong id="model-config"></strong><span class="status-dot"></span>教学模型 · 参数可追溯<br><span style="display:block;margin-top:5px;color:#719285">纯前端 / 可离线 / 不上传数据</span></div></aside>
+<div class="workspace"><header class="topbar"><button class="btn mobile-menu" data-menu aria-label="展开步骤导航">☰</button><div class="crumb">交互式学习 <span style="margin:0 8px;color:#bcc6b5">/</span><b>Transformer 计算解剖室</b></div><div class="tools"><button class="btn subtle" data-precision title="切换矩阵显示精度"><span id="precision-label">3 位小数</span></button><button class="btn" data-export="json" title="导出当前输入、参数与所有中间张量">↓ <span class="export-label">计算数据</span><span class="mobile-json">JSON</span></button><button class="btn" data-export="python">↗ <span>PyTorch</span></button><button class="btn" data-reset>↺ 重置</button></div></header>
+<main class="main-inner"><div class="lab-toolbar" id="lab-toolbar" aria-label="模型输入与配置"></div><div class="stage-head" id="stage-head"></div><div class="progressline"><div id="progress"></div></div><div class="content-grid"><div class="stage-content" id="stage-content"></div><aside class="inspector" id="inspector" aria-label="矩阵计算推导"><div class="inspector-top"><span class="icon">⌘</span>展开一个数字<small>THE WHY PANEL</small></div><div class="inspector-body" id="inspector-body"></div></aside></div><footer class="step-footer" id="step-footer"></footer></main></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+/* Transformer Lab: deterministic, dependency-free numerical engine.
+   Every displayed activation is computed here; weights are illustrative, not pretrained. */
+(function(root){
+'use strict';
+const VOCAB=['我','爱','学习','模型','数据','你','。','<EOS>'];
+const defaults={
+ E:[[1,0,.5,-.5],[0,1,-.5,.5],[.5,.5,1,-1],[.8,-.2,.3,.6],[-.5,.2,.8,.4],[.2,.8,-.3,.1],[-.2,-.1,.1,.6],[0,.2,-.4,.8]],
+ WQ:[[.5,0,.2,-.1],[.1,.6,0,.2],[-.2,.1,.5,0],[0,-.2,.1,.7]],
+ WK:[[.6,.1,0,.2],[0,.5,-.1,.1],[.2,0,.7,-.2],[-.1,.2,0,.5]],
+ WV:[[.5,-.2,.1,0],[.2,.6,0,-.1],[0,.1,.7,.2],[-.1,0,.2,.5]],
+ WO:[[.7,0,.1,-.1],[.1,.6,0,.2],[0,.2,.8,0],[.2,-.1,.1,.7]],
+ W1:[[.5,-.2,.1,.3,0,.4,-.3,.2],[.1,.6,-.4,0,.2,-.1,.5,.3],[-.3,.2,.7,-.2,.4,.1,0,-.5],[.2,0,-.1,.6,-.4,.3,.2,.5]],
+ bMLP1:[[.1,-.2,0,.1,.05,-.05,.15,-.1]],
+ W2:[[.4,.1,-.2,.3],[-.1,.5,.2,0],[.3,-.2,.6,.1],[.2,0,-.1,.5],[-.3,.2,.4,-.1],[.1,.3,0,.2],[.2,-.1,.3,.4],[0,.2,-.2,.3]],
+ bMLP2:[[.05,-.05,0,.1]],
+ gamma1:[[1,1,1,1]], beta1:[[0,0,0,0]],
+ gamma2:[[1,1,1,1]], beta2:[[0,0,0,0]],
+ gammaF:[[1,1,1,1]], betaF:[[0,0,0,0]],
+ W_vocab:[[.3,-.2,.4,.1,-.3,.2,.0,-.1],[-.1,.5,.2,-.2,.1,.3,-.2,.0],[.2,.1,-.1,.4,.5,-.3,.1,-.2],[-.2,.0,.3,.2,-.1,.1,.5,.4]]
+};
+const clone=x=>JSON.parse(JSON.stringify(x));
+const matmul=(a,b)=>a.map(row=>b[0].map((_,j)=>row.reduce((s,v,k)=>s+v*b[k][j],0)));
+const trans=a=>a[0].map((_,j)=>a.map(r=>r[j]));
+const add=(a,b)=>a.map((r,i)=>r.map((v,j)=>v+b[i][j]));
+const scale=(a,s)=>a.map(r=>r.map(v=>v*s));
+const softmax=a=>a.map(r=>{const m=Math.max(...r),e=r.map(v=>Math.exp(v-m)),z=e.reduce((a,b)=>a+b,0);return e.map(v=>v/z)});
+const gelu=x=>.5*x*(1+Math.tanh(Math.sqrt(2/Math.PI)*(x+.044715*x*x*x)));
+function layerNorm(a,g,b,eps=1e-5){const stats=[];const out=a.map(r=>{const mean=r.reduce((a,b)=>a+b,0)/r.length;const variance=r.reduce((s,x)=>s+(x-mean)**2,0)/r.length;const den=Math.sqrt(variance+eps);stats.push({mean,variance,den,eps});return r.map((x,j)=>(x-mean)/den*g[0][j]+b[0][j])});return {out,stats}}
+function forward(opts={}){
+ const ids=opts.ids||[0,1,2],heads=opts.heads||1,dh=4/heads,weights=opts.weights||clone(defaults),alpha=opts.alpha??1,causal=opts.causal??true,scaled=opts.scaled??true,tau=opts.tau??1,target=opts.target??6;
+ if(![1,2].includes(heads)||ids.length<1||ids.length>6||tau<=0)throw Error('Invalid model configuration');
+ const t={},put=(id,data,meta={})=>(t[id]={id,data,...meta},data);
+ for(const [id,data] of Object.entries(weights))put(id,data,{op:'parameter'});
+ const E=put('Emb',ids.map(i=>[...weights.E[i]]),{op:'gather',A:'E',ids});
+ const P=put('P',ids.map((_,p)=>[Math.sin(p),Math.cos(p),Math.sin(p/100),Math.cos(p/100)]),{op:'position'});
+ const Ps=put('Pscaled',scale(P,alpha),{op:'scale',A:'P',scalar:alpha});
+ let X=put('X',add(E,Ps),{op:'add',A:'Emb',B:'Pscaled'});
+ const ln=(id,a,g,b)=>{const v=layerNorm(t[a].data,weights[g],weights[b]);return put(id,v.out,{op:'ln',A:a,g,b,stats:v.stats})};
+ const mm=(id,a,b)=>put(id,matmul(t[a].data,t[b].data),{op:'matmul',A:a,B:b});
+ ln('N1','X','gamma1','beta1');
+ for(const x of ['Q','K','V'])mm(x,'N1','W'+x);
+ const pieces=[];
+ for(let h=0;h<heads;h++){
+   for(const x of ['Q','K','V'])put(x+h,t[x].data.map(r=>r.slice(h*dh,(h+1)*dh)),{op:'slice',A:x,offset:h*dh});
+   const raw=put('Sraw'+h,matmul(t['Q'+h].data,trans(t['K'+h].data)),{op:'qk',A:'Q'+h,B:'K'+h});
+   const S=put('S'+h,scale(raw,scaled?1/Math.sqrt(dh):1),{op:'scale',A:'Sraw'+h,scalar:scaled?1/Math.sqrt(dh):1,dh});
+   const M=put('M'+h,S.map((r,i)=>r.map((x,j)=>causal&&j>i?-Infinity:x)),{op:'mask',A:'S'+h,causal});
+   put('A'+h,softmax(M),{op:'softmax',A:'M'+h});
+   mm('Head'+h,'A'+h,'V'+h);pieces.push('Head'+h);
+ }
+ put('Concat',ids.map((_,i)=>pieces.flatMap(p=>t[p].data[i])),{op:'concat',parts:pieces,dh});
+ mm('Attn','Concat','WO');
+ put('R1',add(X,t.Attn.data),{op:'add',A:'X',B:'Attn'});
+ ln('N2','R1','gamma2','beta2');
+ mm('Ulinear','N2','W1');
+ put('U',t.Ulinear.data.map(r=>r.map((x,j)=>x+weights.bMLP1[0][j])),{op:'bias',A:'Ulinear',B:'bMLP1'});
+ put('G',t.U.data.map(r=>r.map(gelu)),{op:'gelu',A:'U'});
+ mm('Flinear','G','W2');
+ put('FF',t.Flinear.data.map(r=>r.map((x,j)=>x+weights.bMLP2[0][j])),{op:'bias',A:'Flinear',B:'bMLP2'});
+ put('R2',add(t.R1.data,t.FF.data),{op:'add',A:'R1',B:'FF'});
+ ln('Hfinal','R2','gammaF','betaF');
+ mm('Logits','Hfinal','W_vocab');
+ put('Ltau',scale(t.Logits.data,1/tau),{op:'scale',A:'Logits',scalar:1/tau});
+ put('Prob',softmax(t.Ltau.data),{op:'softmax',A:'Ltau'});
+ put('P_train',softmax(t.Logits.data),{op:'softmax',A:'Logits'});
+ const targets=ids.slice(1).concat(target);
+ // Stable cross-entropy: avoid log(0) if a displayed probability underflows.
+ put('Loss',t.Logits.data.map((r,i)=>{const m=Math.max(...r);return [m+Math.log(r.reduce((s,x)=>s+Math.exp(x-m),0))-r[targets[i]]]}),{op:'loss',A:'P_train',targets});
+ const loss=t.Loss.data.reduce((s,r)=>s+r[0],0)/ids.length;
+ put('GradLogits',t.P_train.data.map((r,i)=>r.map((v,j)=>(v-(j===targets[i]?1:0))/ids.length)),{op:'grad_logits',A:'P_train',targets});
+ put('GradHead',matmul(trans(t.Hfinal.data),t.GradLogits.data),{op:'grad_head',A:'Hfinal',B:'GradLogits'});
+ return {t,loss,ids,targets,heads,dh,alpha,causal,scaled,tau,weights};
+}
+const api={VOCAB,defaults,clone,matmul,trans,add,scale,softmax,gelu,layerNorm,forward};
+if(typeof module!=='undefined'&&module.exports)module.exports=api;root.TransformerEngine=api;
+})(typeof window!=='undefined'?window:globalThis);
+
+</script><script>
+/* Interactive presentation layer. No network calls, no UI dependencies. */
+(()=>{
+'use strict';
+const E=window.TransformerEngine, V=E.VOCAB;
+const $=s=>document.querySelector(s), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const state={step:0,ids:[0,1,2],row:2,heads:1,head:0,alpha:1,causal:true,scaled:true,tau:1,target:6,precision:3,weights:E.clone(E.defaults),sel:{id:'A0',i:2,j:1},history:[],trainSteps:0,lastUpdate:null};
+let model,visited=new Set([0]),toastTimer;
+const steps=[
+ ['总览 · 一次前向传播','THE COMPLETE FORWARD PASS','把 Transformer 拆成可计算的每一步','沿着同一组 token，从整数 ID 一直追踪到下一个 token 的概率。每一块矩阵都可以点击，右侧会展开这个数字的完整来历。'],
+ ['Token → Embedding','01 / LOOKUP','文字，怎样变成一排数字？','先把文字映射成词表里的整数索引，再查一张可训练的向量表。不要把 token ID 的大小误认为语义的大小。'],
+ ['加入位置信息','02 / POSITION','相同的词，出现在不同位置','这里用明确可算的正弦 / 余弦编码，把位置向量逐元素加到 token 向量上。它不改变张量形状。'],
+ ['LayerNorm ①','03 / NORMALIZATION','先把每个 token 的数值尺度整理好','当前模型使用 Pre-Norm：进入 Attention 之前，先在每个 token 自己的 4 个特征上计算均值、方差和归一化。'],
+ ['Q / K / V 投影','04 / LINEAR PROJECTIONS','同一份输入，三个不同的投影','Q、K、V 不是三个 token，也不是三个独立语言模型。它们来自同一份输入，分别右乘三张可训练的权重矩阵。'],
+ ['QKᵀ · 注意力分数','05 / PAIRWISE SCORES','每个 token，怎样给其他 token 打分？','一行 Q 与另一行 K 做点积，得到一个标量。把所有 token 配对，就得到一个 T × T 的分数矩阵。'],
+ ['Causal Mask → Softmax','06 / MASK & NORMALIZE','屏蔽未来，再把分数变成比例','先将不允许访问的位置变成负无穷，再对每一行做 Softmax。每一行单独归一化，总和为 1。'],
+ ['加权 V → 输出投影','07 / CONTEXT AGGREGATION','上下文，真正混合进来了','用一整行注意力权重，对各个 token 的 V 向量做加权求和。多头先各自完成，再拼接并经过 Wₒ 投影。'],
+ ['Residual ①','08 / FIRST RESIDUAL','保留输入，再加上 Attention 的更新','残差是逐元素相加，不是拼接。绕过 Attention 的那条支路，带来的是进入本 Block 时的原始 X。'],
+ ['LayerNorm ② → MLP','09 / TOKEN-WISE COMPUTATION','交换信息之后，每个 token 自己计算','先归一化，再做 4 → 8 → 4 的两次线性变换，中间插入非线性 GELU。同一套 MLP 参数应用于所有位置。'],
+ ['Residual ② → Final Norm','10 / BLOCK OUTPUT','完成一个 Block，准备预测','第二次残差把 MLP 的更新加回 Attention 之后的表示。随后做最终归一化，得到送入词表投影的 H。'],
+ ['Logits → 下一个 token','11 / VOCABULARY PROJECTION','4 个特征，怎样变成 8 个候选词？','每个位置的最终向量右乘词表投影矩阵，得到每个候选 token 的原始分数。Softmax 才将分数变成概率。'],
+ ['训练目标 · Loss 与梯度','12 / LEARNING SIGNAL','这些权重，最终是怎样学出来的？','把标签向左对齐：当前位置预测下一个 token。用交叉熵衡量预测误差，再用梯度更新权重。'],
+ ['连接 PyTorch / AI Infra','13 / FROM MATH TO SYSTEMS','把计算链路，变成你的工程直觉','查表、矩阵乘法、归约、逐元素算子：同一个 Transformer，也是一串具体的系统工作负载。这里同时列出实现边界和参考来源。']
+];
+const names={E:'Embedding 权重表',Emb:'查表后的 token 向量',P:'正弦 / 余弦位置编码',Pscaled:'缩放后的位置编码',X:'Embedding + Position',N1:'第一次 LayerNorm 输出',WQ:'Query 投影权重',WK:'Key 投影权重',WV:'Value 投影权重',Q:'完整 Query',K:'完整 Key',V:'完整 Value',WO:'注意力输出投影',Concat:'各头拼接的结果',Attn:'Attention 更新量',R1:'第一次残差结果',N2:'第二次 LayerNorm 输出',W1:'MLP 升维权重',bMLP1:'MLP 第一层偏置',W2:'MLP 降维权重',bMLP2:'MLP 第二层偏置',Ulinear:'MLP 升维乘法结果',U:'加偏置后的中间特征',G:'GELU 激活结果',Flinear:'MLP 降维乘法结果',FF:'MLP 更新量',R2:'第二次残差结果',Hfinal:'最终归一化表示',W_vocab:'输出词表投影权重',Logits:'未归一化的词表分数',Ltau:'温度调整后的分数',Prob:'用于采样的概率',P_train:'训练用概率（τ = 1）',Loss:'各位置的交叉熵',GradLogits:'Loss 对 Logits 的梯度',GradHead:'Loss 对输出投影的梯度',gamma1:'LN₁ 的缩放参数 γ',beta1:'LN₁ 的偏移参数 β',gamma2:'LN₂ 的缩放参数 γ',beta2:'LN₂ 的偏移参数 β',gammaF:'最终 LN 的缩放参数 γ',betaF:'最终 LN 的偏移参数 β'};
+const sources={
+ attention:['PyTorch · Scaled dot-product attention','https://docs.pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html'],
+ ln:['PyTorch · LayerNorm','https://docs.pytorch.org/docs/stable/generated/torch.nn.LayerNorm.html'],
+ gelu:['PyTorch · GELU','https://docs.pytorch.org/docs/stable/generated/torch.nn.GELU.html'],
+ ce:['PyTorch · CrossEntropyLoss','https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html'],
+ linear:['PyTorch · Linear','https://docs.pytorch.org/docs/stable/generated/torch.nn.Linear.html'],
+ gpt:['nanoGPT · model.py','https://github.com/karpathy/nanoGPT/blob/master/model.py'],
+ pos:['Harvard NLP · The Annotated Transformer','https://nlp.seas.harvard.edu/2018/04/03/attention.html']
+};
+const fmt=(v,n=state.precision)=>v===-Infinity?'−∞':v===Infinity?'∞':!Number.isFinite(v)?'NaN':(Math.abs(v)<.5*10**(-n)?0:v).toFixed(n).replace(/^-/, '−');
+const f=v=>fmt(v,5), pct=v=>(100*v).toFixed(1)+'%', tensor=id=>model.t[id].data;
+const xy=(id,i,j)=>`${id}[${i},${j}]`, num=(id,i,j)=>tensor(id)[i][j], rows=()=>state.ids.map((id,i)=>`${i}·${V[id]}`), dlabels=n=>Array.from({length:n},(_,j)=>'d'+j);
+function ref(...keys){return `<div class="ref"><span class="ref-tag">参考</span>${keys.map(k=>`<a href="${sources[k][1]}" target="_blank" rel="noopener noreferrer">${sources[k][0]}</a>`).join(' · ')}</div>`}
+function callout(text,green=false){return `<div class="callout${green?' green':''}">${text}</div>`}
+function formula(text){return `<div class="formula">${text}</div>`}
+function card(title,body,sub=''){return `<section class="card"><h2 class="card-title">${title}${sub?`<small>${sub}</small>`:''}</h2>${body}</section>`}
+function check(question,answer){return `<div class="learn-check"><strong>停一下，检查理解</strong>${question}<details><summary class="reveal">展开答案</summary><div>${answer}</div></details></div>`}
+function heat(v,max=1,prob=false){if(!Number.isFinite(v))return '';if(prob)return `background:rgba(92,140,62,${.06+.59*v})`;const a=Math.min(Math.abs(v)/(max||1),1);return `background:rgba(${v>=0?'116,155,76':'86,129,157'},${.04+.28*a})`}
+function matrix(id,label,options={}){
+ const data=tensor(id),R=data.length,C=data[0].length,prob=options.prob||id.match(/^(A\d|Prob|P_train)$/),max=Math.max(...data.flat().filter(Number.isFinite).map(Math.abs),.01),param=model.t[id].op==='parameter';
+ const rl=options.rl||(param?dlabels(R):R===state.ids.length?rows():dlabels(R));
+ const cl=options.cl||(C===state.ids.length&&/^((Sraw|S|M|A)\d)$/.test(id)?rows():['Logits','Prob','P_train','Ltau','W_vocab','GradLogits','GradHead'].includes(id)?V:dlabels(C));
+ let html=`<div class="matrix-wrap"><div class="matrix-head"><span>${label||id}</span><span class="shape">${R} × ${C}${param?' · θ':''}</span></div><table class="matrix" aria-label="${esc(label||id)}"><thead><tr><th></th>${cl.map(x=>`<th>${esc(x)}</th>`).join('')}</tr></thead><tbody>`;
+ data.forEach((r,i)=>{html+=`<tr class="${i===state.row&&!param?'focus-row':''}"><th>${esc(rl[i]??i)}</th>${r.map((v,j)=>`<td><button class="cell${Number.isFinite(v)?'':' masked'}" style="${heat(v,max,prob)}" data-inspect="${id},${i},${j}" aria-label="展开 ${esc(xy(id,i,j))} 的计算，数值 ${fmt(v)}" title="点击展开 ${esc(xy(id,i,j))}">${fmt(v)}</button></td>`).join('')}</tr>`});
+ return html+'</tbody></table></div>';
+}
+function mrow(...m){return `<div class="matrix-row">${m.join('')}</div>`}
+function focusControls(){return `<div class="focus-buttons">${state.ids.map((id,i)=>`<button data-row="${i}" class="${state.row===i?'active':''}">位置 ${i} · ${esc(V[id])}</button>`).join('')}</div>`}
+function headControls(){return `<div class="segmented">${Array.from({length:state.heads},(_,h)=>`<button data-head="${h}" class="${h===state.head?'active':''}">Head ${h}</button>`).join('')}</div>`}
+function node(title,shape,step,icon='×',orange=false){return `<button class="flow-node${orange?' orange':''}" data-step="${step}"><span class="node-icon">${icon}</span><span><b>${title}</b><small>${shape}</small></span><span class="node-go">↗</span></button>`}
+function range(key,label,min,max,step){return `<label>${label}<input type="range" min="${min}" max="${max}" step="${step}" value="${state[key]}" data-range="${key}" aria-label="${label}"><output data-output="${key}">${state[key].toFixed(2)}</output></label>`}
+function attentionSvg(){const h=state.head,i=state.row,vals=tensor('A'+h)[i],T=state.ids.length,H=46+T*49,center=H/2;return `<svg class="sankey" viewBox="0 0 560 ${H}" role="img" aria-label="位置 ${i} 从各个 Value 向量聚合信息"><defs><marker id="arrow-tip" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="#88a174"/></marker></defs>${vals.map((a,j)=>{const y=35+j*49;return `<path d="M128,${y} C245,${y} 305,${center} 406,${center}" fill="none" stroke="${a===0?'#e2e6db':'#8cab71'}" stroke-width="${a===0?1:1+9*a}" opacity="${a===0?.55:.75}" ${a===0?'stroke-dasharray="4 5"':'marker-end="url(#arrow-tip)"'}/><rect x="8" y="${y-17}" width="119" height="34" rx="6" fill="${a===0?'#f3f4ee':'#f2f6e9'}" stroke="#dce5d0"/><text x="21" y="${y+4}">${esc(V[state.ids[j]])}<tspan class="value-label"> · V${j}</tspan></text><text x="175" y="${y-8}" class="value-label">${pct(a)}</text>`}).join('')}<rect x="406" y="${center-28}" width="145" height="56" rx="8" fill="#fff2e7" stroke="#e6c4a6"/><text x="420" y="${center-3}">${esc(V[state.ids[i]])} 的新表示</text><text x="420" y="${center+16}" class="value-label">Σⱼ A[${i},j] × V[j,:]</text></svg>`}
+function probBars(row=state.row){const p=tensor('Prob')[row],max=p.indexOf(Math.max(...p));return p.map((v,j)=>`<div class="prob-row${j===max?' winner':''}"><span class="label">${esc(V[j])}</span><div class="bar-bg"><div class="bar-fill" style="width:${100*v}%"></div></div><span class="prob-number">${pct(v)}</span></div>`).join('')}
+function stage0(){const T=state.ids.length;return card('一张地图，看见完整的数据流',`
+ <div class="flow-intro"><span class="tiny-label">ONE BLOCK · PRE-NORM · DECODER-ONLY</span><span class="chip orange">点击任意模块深入</span></div>
+ <div class="flow-start">${state.ids.map((id,i)=>`<div class="token">${esc(V[id])}<small>ID ${id} · pos ${i}</small></div>`).join('')}<span class="flow-arrow">→</span><span class="chip">input_ids [1, ${T}]</span></div>
+ <div class="flow-row">${node('查表 · Token Embedding',`[1, ${T}, 4]`,1,'E')}${node('加上位置信息',`X = E[ids] + P`,2,'+') }</div>
+ <div class="flow-arrow">↓</div>
+ <div class="flow-block"><span class="flow-block-label">TRANSFORMER BLOCK × 1</span>
+ <div class="flow-row">${node('① LayerNorm',`N₁ = LN₁(X)`,3,'μ')}${node('Q / K / V 投影',`[1, ${state.heads}, ${T}, ${model.dh}]`,4,'×')}</div>
+ <div class="flow-row">${node('QKᵀ / √dₕ',`[1, ${state.heads}, ${T}, ${T}]`,5,'·')}${node('Mask + Softmax',`每一行分别归一化`,6,'σ')}</div>
+ <div class="flow-row">${node('加权 V → 拼接 → Wₒ',`Attention output [1, ${T}, 4]`,7,'Σ')}${node('① 残差相加',`X₁ = X + Attn(N₁)`,8,'+',true)}</div>
+ <div class="bypass-line">X ─────────────────── 跳过整段 Attention，直接加回 ↗</div>
+ <div class="flow-row">${node('② LayerNorm → MLP',`4 → 8 → GELU → 4`,9,'ƒ')}${node('② 残差相加',`X₂ = X₁ + MLP(LN₂(X₁))`,10,'+',true)}</div>
+ <div class="bypass-line">X₁ ─────────────────────── 跳过 MLP，直接加回 ↗</div></div>
+ <div class="flow-row">${node('Final LayerNorm',`H = LNf(X₂)`,10,'μ')}${node('词表投影 → Logits',`[1, ${T}, 4] → [1, ${T}, 8]`,11,'×')}</div>
+ <div class="flow-row">${node('Softmax → 下一个 token',`只取最后一个位置进行续写`,11,'→',true)}${node('对齐标签 → Loss',`训练时可以并行监督所有位置`,12,'L')}</div>
+ <div class="legend-strip"><span><i class="swatch" style="background:#e6eedb"></i>计算模块</span><span><i class="swatch" style="background:#ffe4d1"></i>残差 / 预测</span><span>θ = 可训练参数；展示时省略 B = 1 这一维</span></div>`)+card('这个实验，具体在算什么？',`
+ <div class="mini-stats"><div class="stat"><div class="number">${T}</div><div class="label">输入 token · T</div></div><div class="stat"><div class="number">4</div><div class="label">隐藏维度 · D</div></div><div class="stat"><div class="number">${state.heads}</div><div class="label">注意力头 · H</div></div><div class="stat"><div class="number">228</div><div class="label">可训练参数总数</div></div></div>
+ <p>词表大小 N = 8；Batch B = 1；一个 Block；MLP 中间维度 F = 8。将头数切换为 2 时，每头维度变成 2，完整 Q / K / V 的宽度仍为 4，参数总量不变。</p>
+ ${callout('<strong>所有数值都是真算的，但权重不是预训练权重。</strong>初始权重是便于观察的小数，预测没有真实语言能力。这个模型只用于理解计算；不代表 GPT-2、LLaMA 或 ChatGPT 的实际结构与预测结果。')}
+ <p>操作方式：上方改变输入，左侧切换步骤，点击矩阵中的数字查看推导。橙色边框是当前结果，绿色边框会标出参与该结果计算的上游元素。参数格可在右侧编辑。</p>${ref('gpt')}`)+card('从最后一个 token 看一次上下文汇聚',`${focusControls()}${attentionSvg()}<div class="attention-footer"><span class="note-inline">每条线的粗细 = 当前注意力权重，不等同于可靠的语义解释。</span><button class="btn small" data-step="6">拆开这些比例 ↗</button></div>`);
+}
+function stage1(){const i=state.row,id=state.ids[i];return card('① 先约定一个教学 tokenizer',`
+ <p>这里不模拟 BPE 分词，而是直接从 8 个词表项中选择 token。比如默认输入“我｜爱｜学习”，会得到 [0, 1, 2]。一个 token 不必是一个汉字或一个完整词；本页的边界是人为固定的。</p>
+ <div class="flow-start">${state.ids.map((id,i)=>`<div class="token">${esc(V[id])}<small>位置 ${i}</small></div><span class="flow-arrow">${i<state.ids.length-1?'·':'→'}</span>`).join('')}<span class="chip">[${state.ids.join(', ')}]</span></div>
+ <div class="shape-path">字符串 → token ID : [B,T] = [1,${state.ids.length}]</div>
+ ${callout('ID 只是查表索引。“ID = 5”不比“ID = 1”更强、更大或更有语义。<strong>离散 ID 本身不参与求导；Embedding 表中的浮点参数参与训练。</strong>')}`)+card('② 用 token ID 作为行号，查 Embedding 表',`
+ <p>下面左边是 E 的全部 8 × 4 个参数。每个 token 取出一整行；同一个 token 在不同位置查到的初始向量相同。点击 E 的任意数字，可以直接修改该参数。</p>
+ ${mrow(matrix('E','E · 可训练参数',{rl:V.map((v,i)=>`${i}·${v}`)}),'<span class="operator">→</span>',matrix('Emb','E[input_ids]'))}
+ ${formula(`Emb[${i}, :] = E[input_ids[${i}], :] = E[${id}, :]<br>= [${tensor('Emb')[i].map(f).join(', ')}]`)}
+ <p>数学上也可表示成 one_hot(input_ids) × E；直接查表避免真的构造很大的 one-hot 矩阵。本页表格省略 Batch 维度，完整输出形状是 [1, ${state.ids.length}, 4]。</p>
+ ${check('两个位置都选择“我”，这里得到的两行向量会不同吗？','不会。同一个 ID 查同一行 E。后面的位置信息与上下文交互，才会使位置相关的表示发生差异。')}${ref('gpt')}`);
+}
+function stage2(){return card('① 先按位置 p，计算 4 个编码值',`
+ <p>D = 4，位置 p 从 0 开始。维度下标 0、2 使用 sin；维度下标 1、3 使用 cos。所有角度采用弧度。</p>
+ ${formula('P[p, 2k] = sin(p / 10000<sup>2k/D</sup>)<br>P[p, 2k+1] = cos(p / 10000<sup>2k/D</sup>)<br><br>D = 4 ⇒ P[p] = [sin(p), cos(p), sin(p/100), cos(p/100)]')}
+ ${mrow(matrix('P','P · 固定公式，不是可训练参数'))}
+ <p>例：p = 0 时是 [0, 1, 0, 1]，不是全零。p = 1 时，第三个分量是 sin(0.01)，而不是 sin(1)。点击任意元素展开精确代入。</p>${ref('pos')}`)+card('② 逐元素相加，形状保持不变',`
+ <div class="control-row">${range('alpha','位置编码强度 α',0,2,.05)}<span class="note-inline">α = 1 为默认；α = 0 为消融实验。拖动滑块，观察下游数字联动。</span></div>
+ ${formula('X = Emb + αP　　[T, 4] + [T, 4] → [T, 4]')}
+ ${mrow(matrix('Emb','内容 Emb'),'<span class="operator">+</span>',matrix('Pscaled','αP'),'<span class="operator">=</span>',matrix('X','X · Block 输入'))}
+ ${callout('<strong>这是正弦加性位置编码，不是 RoPE。</strong>RoPE 的位置操作施加在 Q / K 上，不能直接理解成“往 Embedding 上加 P”。本页没有实现 RoPE。')}
+ <p>无位置编码的无掩码 self-attention 具有置换等变性；因果掩码本身已引入可访问前缀的结构。因此，不能把“没有 P”一概说成“因果模型完全无法区分顺序”。这里用显式 P 提供可计算的位置线索。</p>
+ ${check('加上位置编码后，token 的数量从 T 变成多少？','仍然是 T，隐藏维度也仍是 4。这里只修改每一个分量的数值，不新增 token，也不拼接维度。')}`);
+}
+function normPanel(id,input,g,b){return `${formula(`${id} = γ ⊙ ( ${input} − μ ) / √(σ² + ε) + β<br>μ = Σⱼ xⱼ / D；σ² = Σⱼ(xⱼ−μ)² / D；D=4；ε=10<sup>−5</sup>`)}${mrow(matrix(input,`${input} · 输入`),'<span class="operator">→</span>',matrix(id,`${id} · 归一化结果`))}<details class="collapsible"><summary>查看 γ / β：每个特征一个参数，所有 token 共用</summary><div class="inside">${mrow(matrix(g,'γ · 乘法缩放',{rl:['γ']}),matrix(b,'β · 加法偏移',{rl:['β']}))}</div></details>`}
+function stage3(){return card('归一化的方向：横向，每个 token 自己的一整行',`
+ ${normPanel('N1','X','gamma1','beta1')}
+ <p>当前 γ 初始为 [1,1,1,1]，β 初始为 [0,0,0,0]。这不是把一整批 token 混起来归一化，也不是将数值限制在 [0,1]。输入每一行各有自己的 μ 与 σ²。</p>
+ ${callout('方差分母使用 D = 4，而不是 D − 1。ε 避免零方差导致除零。即使 γ = 1、β = 0，由于 ε 存在，输出方差也只是接近 1。',true)}
+ ${check('第一行的 LayerNorm 结果，是否需要知道第二行是什么？','不需要。本页 LayerNorm 只沿最后一维 D 计算，不跨 token，不跨 Batch。')}${ref('ln')}`)+card('为什么叫 Pre-Norm？',`
+ ${formula('X₁ = X + Attention( LN₁(X) )<br>X₂ = X₁ + MLP( LN₂(X₁) )')}
+ <p>Norm 在每个子层的输入处，所以叫 Pre-Norm。两次残差是两次独立相加。Post-Norm 则是在相加之后再做 Norm；两者不能在同一张图中随意互换。</p>
+ <p>这一步之后，Q / K / V 的直接输入是 N1 = LN₁(X)，不是未经归一化的 X。后面所有数值都遵循这个顺序。</p>${ref('gpt')}`);
+}
+function stage4(){const h=state.head;return card('① 三次矩阵乘法，使用三套不同权重',`
+ ${formula('Q = N₁W<sub>Q</sub>　 K = N₁W<sub>K</sub>　 V = N₁W<sub>V</sub><br>[T,4] × [4,4] → [T,4]')}
+ <p>每个输出元素都是“输入的一行”与“权重的一列”做点积。本页省略 Q / K / V 的线性偏置，便于直接检查所有乘加项。</p>
+ ${mrow(matrix('N1','N₁ · 同一份输入'))}
+ <details class="collapsible" open><summary>三张投影权重：点击参数即可编辑</summary><div class="inside">${mrow(matrix('WQ','W_Q'),matrix('WK','W_K'),matrix('WV','W_V'))}</div></details>
+ ${mrow(matrix('Q','Q · Query'),matrix('K','K · Key'),matrix('V','V · Value'))}
+ ${callout('<strong>重要区别：权重 W 是跨样本共享的参数；Q / K / V 是这一次前向传播的结果。</strong>第一层同一 token、同一位置会得到相同的初始 Q / K / V，但 Attention 还会与其他 token 的 K、V 交互。后续层的输入已经包含上下文。')}${ref('linear','gpt')}`)+card('② 按头拆开：reshape / transpose 不做数值乘法',`
+ <div class="control-row"><label>头数 H <select class="toolbar-select" data-key="heads"><option value="1"${state.heads===1?' selected':''}>1 · 先看单头</option><option value="2"${state.heads===2?' selected':''}>2 · 再看多头</option></select></label>${headControls()}</div>
+ <div class="shape-path">[1, T, 4] → [1, T, H, dₕ] → [1, H, T, dₕ]　dₕ = 4 / ${state.heads} = ${model.dh}</div>
+ <p>当前 Head ${h} 取完整投影的第 ${h*model.dh}～${(h+1)*model.dh-1} 列。切成两头后，每个头独立做注意力；这不仅是显示方式变化，也改变分组点积和归一化的计算。</p>
+ ${mrow(matrix('Q'+h,`Q · Head ${h}`),matrix('K'+h,`K · Head ${h}`),matrix('V'+h,`V · Head ${h}`))}
+ ${check('从单头切换到两头，是否增加了 WQ 的参数数量？','没有。本页保持总隐藏维度 D = 4，WQ 始终是 4 × 4。分成两组 2 维的注意力计算；总投影宽度不变。')}${ref('attention')}`);
+}
+function stage5(){const h=state.head;return card('① 分数 Sᵣₐw[i,j] = 第 i 行 Q · 第 j 行 K',`
+ <div class="control-row">${headControls()}<span class="note-inline">行：谁在查询；列：被查询的是谁。</span></div>
+ ${formula(`Sraw[i,j] = Σ<sub>d=0</sub><sup>${model.dh-1}</sup> Q[i,d] × K[j,d]<br>[T,dₕ] × [dₕ,T] → [T,T]`)}
+ ${mrow(matrix('Q'+h,'Q'),matrix('K'+h,'K · 展示原矩阵，计算时转置'),matrix('Sraw'+h,'QKᵀ · 原始点积'))}
+ <p>K 在图中按原始形状展示。计算 QKᵀ 时，K 的第 j 行成为 Kᵀ 的第 j 列。因此右侧展开时配对的是 Q[i,d] 与 K[j,d]，不是 K[d,j]。</p>
+ ${check('Sraw[1,2] 这一格，是谁在关注谁？','位置 1 的 token 在对位置 2 的 token 打分。因果模型稍后会把这一格屏蔽，因为 2 是 1 的未来。')}${ref('attention')}`)+card('② 再除以 √dₕ，而不是 √T',`
+ <div class="control-row"><label class="switch"><input type="checkbox" data-check="scaled" ${state.scaled?'checked':''}>启用 1 / √dₕ 缩放</label><span class="chip">dₕ = ${model.dh}　√dₕ = ${f(Math.sqrt(model.dh))}</span></div>
+ ${formula(`S = Sraw ${state.scaled?'/ √'+model.dh:'× 1（关闭缩放的对照实验）'}`)}
+ ${mrow(matrix('S'+h,'S · 缩放后的分数'))}
+ <p>当 Q、K 分量近似独立、均值为 0 且方差为 1 时，dₕ 项乘积之和的方差约为 dₕ；除以 √dₕ 可使其方差保持在相近尺度。这是解释缩放动机的假设模型，不是每个真实 token 都严格满足的分布定律。</p>
+ ${callout('这里还没有施加 Mask。未来位置的原始分数可以先被计算出来，再屏蔽；<strong>不能因为矩阵里暂时存在未来分数，就认为模型已经读取了未来内容。</strong>')}${ref('attention')}`);
+}
+function stage6(){const h=state.head,i=state.row,a=tensor('A'+h)[i],alt=state.ids.slice();alt[alt.length-1]=(alt[alt.length-1]+1)%V.length;const other=E.forward({...state,ids:alt});return card('① Causal Mask：把未来的分数改成 −∞',`
+ <div class="control-row">${headControls()}<label class="switch"><input type="checkbox" data-check="causal" ${state.causal?'checked':''}>开启因果掩码（j ≤ i 才可见）</label></div>
+ ${formula('M[i,j] = S[i,j]　当 j ≤ i<br>M[i,j] = −∞　　当 j > i')}
+ ${!state.causal?callout('<strong>当前关闭了因果掩码。</strong>这是用来观察未来信息泄漏的对照实验，不是合法的自回归语言模型计算。'):''}
+ ${mrow(matrix('S'+h,'S · 掩码前'),'<span class="operator">→</span>',matrix('M'+h,'M · 掩码后'))}
+ <p>对角线不屏蔽：位置 i 的输入 token 已知，它可以看自己，用来预测位置 i+1 的 token。这里不是让位置 i 预测它自己。</p>${ref('attention')}`)+card('② 每一行单独 Softmax：分数 → 加权比例',`
+ ${formula('m = maxⱼ M[i,j]<br>eⱼ = exp(M[i,j] − m)<br>A[i,j] = eⱼ / Σₖ eₖ')}
+ ${mrow(matrix('A'+h,'A · 注意力权重',{prob:true}))}
+ ${focusControls()}
+ <p>当前行 ${i} 的和：${a.map(f).join(' + ')} ≈ <strong>${f(a.reduce((s,x)=>s+x,0))}</strong>。表格显示有舍入，实际计算使用未舍入的数值。</p>
+ ${callout('不能把被屏蔽的分数简单设成 0：exp(0) = 1，仍会分到权重。设成 −∞ 后，exp(−∞) = 0。减去一行的最大值不改变 Softmax 比例，只避免指数上溢。',true)}
+ ${attentionSvg()}${ref('attention')}`)+card('动手验证：换掉未来的最后一个 token',`
+ <p>原序列：${state.ids.map(id=>esc(V[id])).join(' / ')}。对照序列：${alt.map(id=>esc(V[id])).join(' / ')}。其他参数完全不变，比较最终 H 的逐行最大绝对差。</p>
+ <table class="info-table"><thead><tr><th>被观察的位置</th><th>max |H 原值 − H 对照|</th><th>含义</th></tr></thead><tbody>${state.ids.map((id,r)=>{const delta=Math.max(...tensor('Hfinal')[r].map((x,j)=>Math.abs(x-other.t.Hfinal.data[r][j])));return `<tr><td>${r} · ${esc(V[id])}</td><td class="mono ${delta<1e-12?'success':'warning'}">${delta.toFixed(8)}</td><td>${r===state.ids.length-1?'自身输入已被修改':state.causal?'未来变化被屏蔽':'允许看到未来，结果可能变化'}</td></tr>`}).join('')}</tbody></table>
+ <p>开启因果掩码时，较早位置应该保持不变。这比“模型不能看未来”的口头解释更直接。序列只有一个 token 时，没有更早位置可作对照。</p>`);
+}
+function stage7(){const h=state.head;return card('① 对每个特征，用同一行注意力权重求和',`
+ <div class="control-row">${headControls()}${focusControls()}</div>
+ ${formula('Head[i,d] = Σⱼ A[i,j] × V[j,d]<br>[T,T] × [T,dₕ] → [T,dₕ]')}
+ ${mrow(matrix('A'+h,'A · 混合的比例',{prob:true}),'<span class="operator">×</span>',matrix('V'+h,'V · 被混合的内容'),'<span class="operator">=</span>',matrix('Head'+h,`Head ${h} · 聚合结果`))}
+ ${attentionSvg()}
+ ${callout('<strong>A 不是训练后存起来的一张固定参数表。</strong>它由这次输入的 Q、K 动态计算。每个输出行混合所有可访问位置的 V，但 token 数量仍然是 T。')}
+ ${check('如果某行 A = [0,1,0]，那么这一行的输出是什么？','就是第二个 token 的整行 V 向量。不是第二个 token 的 ID，也不一定等于它最初的 Embedding。')}${ref('attention')}`)+card('② 拼接多个头，再右乘 Wₒ',`
+ ${formula(`C = Concat(Head₀${state.heads===2?', Head₁':''})<br>Attention = C × W<sub>O</sub><br>[T,4] × [4,4] → [T,4]`)}
+ <p>${state.heads===1?'现在只有一个头，拼接不会改变任何数值。即使单头，本页仍保留输出投影 Wₒ。':'两个头的输出各是 [T,2]；沿特征维拼成 [T,4]。不是把 token 行数拼成 2T。'}</p>
+ ${mrow(matrix('Concat','C · 拼接结果'),matrix('WO','Wₒ · 输出权重'),matrix('Attn','Attention · 待加入残差的更新'))}
+ ${ref('gpt')}`);
+}
+function stage8(){return card('逐元素相加：X₁ = X + Attention',`
+ ${formula('X₁[i,d] = X[i,d] + Attention[i,d]<br>[T,4] + [T,4] → [T,4]')}
+ ${mrow(matrix('X','X · 原输入'),'<span class="operator">+</span>',matrix('Attn','Attention · 更新'),'<span class="operator">=</span>',matrix('R1','X₁ · 相加后的结果'))}
+ <p>注意，跳连拿来相加的是 X，不是 LN₁(X)。Attention 分支先归一化、再计算更新；旁路保留未经过这个分支变换的输入。</p>
+ ${callout('残差不是“所有信息永远不会损失”的保证。它提供的是一条显式加法路径，让子层可以学习相对输入的更新。如果 Attention 输出为零，X₁ 就恰好等于 X。',true)}
+ ${check('把两个 [T,4] 的矩阵相加，结果会变成 [T,8] 吗？','不会。逐元素加法保持 [T,4]；沿最后一维拼接才会得到 [T,8]。')}${ref('gpt')}`)+card('用链式法则理解残差的直接路径',`
+ ${formula('y = x + f(x)<br>∂y/∂x = I + ∂f/∂x')}
+ <p>梯度中存在恒等映射 I 这条直接路径。这有助于理解为何深层模型采用残差结构，但并不等于“梯度一定不会消失或爆炸”。本页展示前向数值；完整反向可用导出的 PyTorch 脚本检查。</p>`);
+}
+function stage9(){return card('① 先做第二次 LayerNorm',`${normPanel('N2','R1','gamma2','beta2')}<p>这次输入是 X₁ = R1，即已经经过 Attention 和第一次残差的结果。LN₂ 的 γ、β 与 LN₁ 是不同参数，不共用同一个可训练数组。</p>${ref('ln')}`)+card('② 升维：4 → 8，并加上偏置',`
+ ${formula('Ulinear = N₂ × W₁<br>U[i,k] = Ulinear[i,k] + b₁[k]')}
+ ${mrow(matrix('W1','W₁ · [4,8]'),matrix('bMLP1','b₁ · 广播到每个 token',{rl:['b₁']}),matrix('U','U · [T,8]'))}
+ <details class="collapsible"><summary>查看“加偏置之前”的矩阵乘法结果</summary><div class="inside">${mrow(matrix('Ulinear','Ulinear'))}</div></details>
+ <p>本教学模型选 F = 8，即 2D，目的是保持表格可读。这个比例不是所有 Transformer 的固定规定。MLP 各位置共享同一张 W₁ 和同一行 b₁。</p>${ref('linear')}`)+card('③ 非线性 GELU：不是简单地把负数清零',`
+ ${formula('GELU(x) ≈ 0.5x · [1 + tanh(√(2/π) · (x + 0.044715x³))]')}
+ ${mrow(matrix('U','激活前 U'),'<span class="operator">→</span>',matrix('G','激活后 G'))}
+ <p>这里明确采用 GELU 的 tanh 近似，与导出脚本 F.gelu(..., approximate="tanh") 对应。负数可能变成较小的负数，而不是像 ReLU 一样全变成 0。点击一个格子，查看立方、tanh、乘法的全部代入。</p>
+ ${check('两次线性变换之间没有非线性，会怎样？','对固定输入而言，两次仿射变换可以合并成一次仿射变换。非线性使这一段不再只是一个等效线性映射。')}${ref('gelu')}`)+card('④ 降维：8 → 4，得到 MLP 的更新量',`
+ ${formula('Flinear = G × W₂<br>FF = Flinear + b₂　　[T,8] × [8,4] → [T,4]')}
+ ${mrow(matrix('W2','W₂ · 降维权重'),matrix('bMLP2','b₂ · 广播偏置',{rl:['b₂']}),matrix('FF','FF · MLP 的最终更新'))}
+ <details class="collapsible"><summary>查看降维乘法的中间结果</summary><div class="inside">${matrix('Flinear','Flinear')}</div></details>
+ ${callout('<strong>MLP 不在不同 token 之间直接混合。</strong>它沿每行的特征维做计算；这一行已有的上下文信息，来自之前的 Attention。')}${ref('gpt')}`);
+}
+function stage10(){return card('① 第二次残差：回到 X₁ 上叠加更新',`
+ ${formula('X₂ = X₁ + FF<br>X₂[i,d] = X₁[i,d] + FF[i,d]')}
+ ${mrow(matrix('R1','X₁ · Attention 之后'),'<span class="operator">+</span>',matrix('FF','FF · MLP 更新'),'<span class="operator">=</span>',matrix('R2','X₂ · Block 输出'))}
+ <p>此处加回的是 X₁，不是最初的 X，也不是 LN₂(X₁)。现在一个完整 Block 已完成，输入和输出都是 [1, ${state.ids.length}, 4]。</p>${ref('gpt')}`)+card('② Final LayerNorm：最后才接词表预测头',`
+ ${normPanel('Hfinal','R2','gammaF','betaF')}
+ <p>在堆叠多层的模型中，X₂ 会作为下一层 Block 的输入，重复相同结构但使用不同层的参数。最终归一化在所有 Block 之后，而不是用来替代每个子层前面的 Norm。本页只实现一个 Block。</p>
+ ${callout('“每层表示更复杂”不等于“某一层固定负责语法，下一层固定负责语义”。本页没有给某个维度或某个头人工指定语义职责。',true)}${ref('gpt')}`);
+}
+function stage11(){const r=state.row,prob=tensor('Prob')[r],winner=prob.indexOf(Math.max(...prob)),last=state.ids.length-1,lastp=tensor('Prob')[last],next=lastp.indexOf(Math.max(...lastp));return card('① 对词表中的每个 token，各算一个分数',`
+ ${formula('Logits = H × W_vocab<br>[T,4] × [4,8] → [T,8]')}
+ ${mrow(matrix('Hfinal','H · 最终表示'),matrix('W_vocab','W_vocab · 8 个候选词的权重'),matrix('Logits','Logits · 原始分数'))}
+ <p>每一列对应一个候选词。比如第 j 列的分数，是当前位置 4 维表示与 W_vocab 第 j 列的点积。本页输出投影与输入 E 不共享权重；输出投影没有偏置。</p>
+ ${callout('Logits 不是概率：可以为负数，也不需要加起来等于 1。它们是每个候选 token 在当前上下文下的未归一化分数。')}${ref('gpt','ce')}`)+card('② Softmax：整行的相对分数，变成概率',`
+ <div class="control-row">${range('tau','采样温度 τ',.2,2,.05)}<span class="note-inline">温度只作用于这里，不改变 Attention；训练 Loss 固定 τ = 1。</span></div>
+ ${formula('p[j] = exp(Logits[j]/τ − m) / Σₖ exp(Logits[k]/τ − m)<br>m = maxₖ(Logits[k]/τ)')}
+ ${mrow(matrix('Prob','p · 词表概率',{prob:true}))}
+ <div class="attention-footer">${focusControls()}<span class="chip">当前行最高：${esc(V[winner])}</span></div>
+ ${probBars(r)}
+ <p>较低温度使分布更集中，较高温度使分布更平缓。对于正温度，缩放不会改变最高分的次序；它会改变随机采样的分布。最高分是并列时，本页 argmax 选第一个。</p>
+ <details class="collapsible"><summary>查看温度调整后的中间分数</summary><div class="inside">${matrix('Ltau','Logits / τ')}</div></details>`)+card('③ 真正续写：只用最后一个位置，再把新 token 接回输入',`
+ <div class="train-example">输入 ${state.ids.map(id=>`<span>${esc(V[id])}</span>`).join(' · ')}<span>→ 取位置 ${last} 的概率 →</span><span class="target">${esc(V[next])}</span></div>
+ <div class="control-row"><button class="btn orange" data-generate="argmax" ${state.ids.length>=6?'disabled':''}>贪心生成 1 个 token →</button><button class="btn" data-generate="sample" ${state.ids.length>=6?'disabled':''}>按概率采样 1 个</button><span class="note-inline">最多展示 6 个 token；可在顶部删掉末尾 token。</span></div>
+ <p>生成一个新 token 后，把它接到序列末尾，再做下一次前向传播。不是 Attention 一次把 T 个输入“拉长”为 T+1 个输出。为让过程透明，本页每次重算完整前缀，没有使用 KV Cache。</p>
+ ${callout('这里是未预训练的小模型，生成内容通常没有意义。输出用于验证自回归数据流，不用于演示语言能力。',true)}
+ ${check('输入有 3 个 token，Logits 是 [1,3,8]；为什么只用最后一行续写？','前两行分别预测已在输入中出现的后续位置。最后一行才对应“当前整个已知前缀之后”的那个未知 token。训练时可以用全部有效位置的 Logits 同时计算监督损失。')}${ref('gpt')}`);
+}
+function historySvg(){const ys=state.history.length?state.history:[model.loss],lo=Math.min(...ys)*.95,hi=Math.max(...ys)*1.05,den=hi-lo||1;const points=ys.map((y,i)=>`${38+i*508/Math.max(ys.length-1,1)},${129-(y-lo)/den*102}`).join(' ');return `<svg class="training-graph" viewBox="0 0 560 158" aria-label="输出头训练损失曲线"><line x1="38" y1="132" x2="546" y2="132" stroke="#dae3cf"/><text x="0" y="27" class="legend-label">${hi.toFixed(2)}</text><text x="0" y="131" class="legend-label">${lo.toFixed(2)}</text><polyline points="${points}" fill="none" stroke="#7f9f61" stroke-width="2.5"/><text x="38" y="151" class="legend-label">step 0</text><text x="487" y="151" class="legend-label">step ${state.trainSteps}</text></svg>`}
+function stage12(){const T=state.ids.length;return card('① 标签右移一位，让当前位置预测下一个 token',`
+ <p>把“输入序列 + 最后一个目标 token”视为一段训练文本。input = sequence[:-1]，target = sequence[1:]。每一行的标签，都严格落在该输入位置的下一位。</p>
+ <div class="control-row"><label>最后一个位置的真实标签 <select class="toolbar-select" data-key="target">${V.map((v,j)=>`<option value="${j}"${j===state.target?' selected':''}>${esc(v)}</option>`).join('')}</select></label></div>
+ ${state.ids.map((id,i)=>`<div class="train-example"><span class="chip">位置 ${i}</span><span>只能用前缀 ${state.ids.slice(0,i+1).map(id=>esc(V[id])).join(' / ')}</span><span>→ 预测</span><span class="target">${esc(V[model.targets[i]])}</span></div>`).join('')}
+ ${!state.causal?callout('因果掩码当前关闭：此时可能从未来读到答案。下面可看损失计算，但训练按钮暂时禁用；请在第 06 步开启掩码。'):''}
+ ${formula('Lᵢ = −log p_train[i, targetᵢ]<br>L = (1/T) Σᵢ Lᵢ　　p_train = softmax(Logits)，固定 τ = 1')}
+ ${mrow(matrix('P_train','p_train · 训练概率',{prob:true}),matrix('Loss','每个位置的 Loss',{cl:['−ln p']}))}
+ <div class="takeaway"><strong>当前平均损失 L = ${f(model.loss)}</strong><p>自然对数，单位为 nat。目标概率越小，负对数越大。这里所有 ${T} 个位置都有效，没有 padding 或被忽略的标签。</p></div>
+ <p>PyTorch 的 cross_entropy 直接接收原始 Logits，内部完成稳定的 log-softmax 和负对数似然；不要先对 Logits 做 Softmax 再交给这个接口。</p>${ref('ce')}`)+card('② 一个精确梯度：输出头是怎样收到学习信号的？',`
+ ${formula('∂L/∂Logits[i,j] = (p_train[i,j] − 1[j=targetᵢ]) / T<br>∂L/∂W_vocab[d,j] = Σᵢ H[i,d] × ∂L/∂Logits[i,j]')}
+ ${mrow(matrix('GradLogits','dL / dLogits'),matrix('GradHead','dL / dW_vocab',{rl:dlabels(4),cl:V}))}
+ <p>点击任意梯度，可以展开全部数值代入。正确类别的 logit 梯度通常为负：沿负梯度方向更新，倾向于提高这个正确类别的分数。</p>
+ ${check('推理生成 token 时，模型权重也会跟着改变吗？','通常不会。普通前向推理只产生激活与输出，不执行 backward / optimizer.step。页面的生成按钮不会更新权重；下面的训练按钮才会修改输出头。')}`)+card('③ 教学小实验：冻结主干，只训练词表输出头',`
+ <div class="training-status"><span>SGD · lr = 0.20</span><span>已更新 ${state.trainSteps} 步</span><span>当前 loss ${f(model.loss)}</span></div>
+ ${historySvg()}
+ <div class="control-row"><button class="btn primary" data-train="1" ${!state.causal?'disabled':''}>训练 1 步</button><button class="btn" data-train="20" ${!state.causal?'disabled':''}>连续训练 20 步</button><button class="btn subtle" data-reset-head>重置输出头</button></div>
+ ${formula('W_vocab ← W_vocab − 0.20 × ∂L/∂W_vocab')}
+ <p>只对当前这一段序列拟合输出头，Embedding / Attention / MLP / Norm 参数保持不变；这是局部学习演示，不是完整语言模型训练，更不代表泛化能力。更改其他实验设置后，训练曲线会重新计数。</p>
+ ${state.lastUpdate?callout(`最近一步：平均 loss 从 ${f(state.lastUpdate.before)} 变为 ${f(state.lastUpdate.after)}。点击 W_vocab 参数，可查看该参数的上一数值、梯度和本次 SGD 更新。`,true):''}
+ <p>完整训练会继续沿链式法则，把梯度传播到所有可训练权重。导出的 PyTorch 脚本包含全参数 backward()，并打印每组参数的梯度范数。</p>`);
+}
+function stage13(){const T=state.ids.length,D=4,F=8,N=8,H=state.heads;const items=[['Token Embedding','按 token ID 读取行','[T,4]','查表 / 内存访问'],['Q / K / V','3 次矩阵乘法',3*2*T*D*D,'矩阵乘法'],['QKᵀ 与 AV','每头独立，稠密计算',4*T*T*D,'矩阵乘法'],['Attention Wₒ','拼接后投影',2*T*D*D,'矩阵乘法'],['MLP W₁ 与 W₂','4 → 8 → 4',4*T*D*F,'矩阵乘法'],['W_vocab','隐藏向量投影到词表',2*T*D*N,'矩阵乘法'],['Norm / Softmax','均值、平方和、指数和','—','归约 + 逐元素计算'],['Residual / GELU','加法与非线性','—','逐元素计算']];return card('从你熟悉的 Infra 视角，重新看这一条链',`
+ <div class="scroll-table"><table class="info-table"><thead><tr><th>组件</th><th>本页做什么</th><th>乘加估算 FLOPs</th><th>算子类别</th></tr></thead><tbody>${items.map(r=>`<tr>${r.map((x,j)=>`<td${j===2?' class="mono"':''}>${x}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+ <p>FLOP 约定：一次乘法与一次加法计 2 FLOPs。这里只估算前向的稠密矩阵乘法，不含偏置、Norm、Softmax、GELU，不是浏览器实际性能测量。因果掩码不改变本实现先算完整分数矩阵的事实。</p>
+ <div class="mini-stats"><div class="stat"><div class="number">${H*T*T}</div><div class="label">注意力矩阵元素 H·T²</div></div><div class="stat"><div class="number">${H*T*T*4} B</div><div class="label">单个 A 按 FP32 估算</div></div><div class="stat"><div class="number">${2*T*D*4} B</div><div class="label">单层 K+V 按 FP32 估算</div></div><div class="stat"><div class="number">${228*4} B</div><div class="label">全部参数按 FP32 估算</div></div></div>
+ <p>这些只计算指定张量的理论有效载荷，不包含运行时、梯度、优化器状态或其他激活。本页 JavaScript 实际使用双精度 Number 计算，不是 FP32 GPU 执行。</p>
+ ${callout('参数通常跨 step 保存；Q、K、V、注意力分数等激活由输入实时产生。训练还要保存或重算反传所需的中间量；推理 KV Cache 保留的是各层旧 token 的 K、V，不是最终 logits。本页未实现 GPU kernel、KV Cache 或分布式训练。',true)}${ref('gpt','attention')}`)+card('一份和当前界面数值对应的 PyTorch 脚本',`
+ <p>右上角导出当前输入、参数和实验设置。脚本采用 torch.float64 对齐浏览器计算；没有外部模型或数据集下载。安装 PyTorch 后即可运行，并可用梯度范数检查反向传播。</p>
+ <div class="source-code-title"><span class="chip">snapshot → transformer_snapshot.py</span><button class="btn primary" data-export="python">导出当前 PyTorch 复现</button></div>
+ <pre class="codeblock">x = token_embedding[input_ids] + position_encoding
+n1 = layer_norm(x)
+q, k, v = n1 @ Wq, n1 @ Wk, n1 @ Wv
+scores = (q @ k.transpose(-2, -1)) / sqrt(head_dim)
+a = softmax(causal_mask(scores), dim=-1)
+x1 = x + concat_heads(a @ v) @ Wo
+n2 = layer_norm(x1)
+ff = gelu(n2 @ W1 + b1) @ W2 + b2
+x2 = x1 + ff
+h = final_layer_norm(x2)
+logits = h @ W_vocab
+loss = cross_entropy(logits, shifted_targets)
+loss.backward()</pre>
+ <p>表格按数学约定将 W 写成 [输入维, 输出维]。PyTorch nn.Linear.weight 通常存成 [输出维, 输入维]，内部计算是 x @ weight.T + bias。导出脚本直接使用显式矩阵乘法，因此与本页 W 的方向一致。</p>${ref('linear','gpt')}`)+card('实现边界：哪些是真实计算，哪些是教学选择？',`
+ <div class="link-grid"><div class="learn-card"><b>完整保留的路径</b><p>Embedding、正弦位置编码、两次 Pre-LayerNorm、因果多头注意力、输出投影、两次残差、两层 GELU MLP、最终 Norm、词表投影、Softmax、交叉熵与输出头梯度。</p></div><div class="learn-card"><b>明确简化的部分</b><p>B=1、1 Block、D=4、词表=8、MLP=8；无 Dropout；无 QKV / Attention 输出 / LM Head 偏置；未实现 BPE、RoPE、RMSNorm、GQA、KV Cache、GPU 或全参数训练按钮。</p></div></div>
+ <p>位置编码采用原始 Transformer 的正弦方案；Block 采用 Pre-Norm decoder-only 计算结构；MLP 采用 GELU tanh 近似。这是为教学组成的微型模型，不是任何现成模型的逐参数复刻。</p>
+ <p>所有参数初始值均为人工设置的可读小数；页面默认展示 ${state.precision} 位小数，计算用未舍入的 JavaScript Number。可编辑参数限制在 [−10, 10]，便于避免无意义的数值溢出。</p>`)+card('参考实现与公式来源',`
+ <div class="reference-list">${Object.entries(sources).map(([k,v])=>`<a href="${v[1]}" target="_blank" rel="noopener noreferrer">↗ ${v[0]}<small>${({attention:'缩放点积、因果掩码、逐行注意力计算',ln:'均值、总体方差、epsilon 与可学习仿射参数',gelu:'tanh 近似公式中的系数与操作顺序',ce:'未归一化 Logits、类别索引与交叉熵损失',linear:'PyTorch 权重矩阵的存储方向',gpt:'Pre-Norm Block、残差、最终归一化与语言模型预测头',pos:'正弦 / 余弦位置编码的具体表达式'})[k]}</small></a>`).join('')}</div>
+ <p>这些引用用于核对公式和结构，不是本页教学权重的来源。前端核心运算和交互可离线运行；只有点击参考链接会访问外部网站。</p>`);
+}
+const renderers=[stage0,stage1,stage2,stage3,stage4,stage5,stage6,stage7,stage8,stage9,stage10,stage11,stage12,stage13];
+function depsFor(id,i,j){
+ const t=model.t[id];if(!t)return [];
+ const d=[];const put=(a,r,c)=>d.push([a,r,c]);
+ switch(t.op){
+  case 'gather':put(t.A,t.ids[i],j);break;
+  case 'add':put(t.A,i,j);put(t.B,i,j);break;
+  case 'bias':put(t.A,i,j);put(t.B,0,j);break;
+  case 'scale':case 'mask':case 'gelu':put(t.A,i,j);break;
+  case 'slice':put(t.A,i,j+t.offset);break;
+  case 'matmul':tensor(t.A)[i].forEach((_,k)=>{put(t.A,i,k);put(t.B,k,j)});break;
+  case 'qk':tensor(t.A)[i].forEach((_,k)=>{put(t.A,i,k);put(t.B,j,k)});break;
+  case 'ln':tensor(t.A)[i].forEach((_,k)=>put(t.A,i,k));put(t.g,0,j);put(t.b,0,j);break;
+  case 'softmax':tensor(t.A)[i].forEach((_,k)=>put(t.A,i,k));break;
+  case 'concat':put(t.parts[Math.floor(j/t.dh)],i,j%t.dh);break;
+  case 'loss':put(t.A,i,t.targets[i]);break;
+  case 'grad_logits':put(t.A,i,j);break;
+  case 'grad_head':tensor(t.A).forEach((_,r)=>{put(t.A,r,i);put(t.B,r,j)});break;
+ }
+ return d;
+}
+function updateHighlights(){document.querySelectorAll('.cell.selected,.cell.related').forEach(x=>x.classList.remove('selected','related'));const {id,i,j}=state.sel;for(const [a,r,c] of depsFor(id,i,j)){document.querySelectorAll(`[data-inspect="${a},${r},${c}"].cell`).forEach(el=>el.classList.add('related'))}document.querySelectorAll(`[data-inspect="${id},${i},${j}"].cell`).forEach(el=>el.classList.add('selected'))}
+const dep=(id,i,j,label)=>`<button class="dep" data-inspect="${id},${i},${j}">${esc(label||xy(id,i,j))} ↗</button>`;
+function renderInspector(){
+ let {id,i,j}=state.sel;if(!model.t[id]){state.sel={id:'X',i:Math.min(state.row,state.ids.length-1),j:0};({id,i,j}=state.sel)}
+ const t=model.t[id];i=Math.min(i,t.data.length-1);j=Math.min(j,t.data[0].length-1);state.sel={id,i,j};const value=t.data[i][j];const parts=[];
+ const section=(title,html)=>parts.push(`<div class="deriv-section"><div class="deriv-title"><span class="dot">${parts.length+1}</span>${title}</div>${html}</div>`);
+ const calc=html=>`<div class="calc-line">${html}</div>`;
+ const box=html=>`<div class="calc-box">${html}</div>`;
+ let note=names[id]||(/^[QKV]\d$/.test(id)?`第 ${id.slice(-1)} 个头的 ${id[0]}`:/^A\d$/.test(id)?'从当前输入算出的注意力权重':/^Sraw/.test(id)?'Q、K 对应行的点积':/^S\d/.test(id)?'经过缩放的注意力分数':/^M\d/.test(id)?'经过因果掩码的分数':/^Head/.test(id)?'单个头的上下文聚合结果':'前向传播的中间结果');
+ const typ={parameter:'PARAMETER θ',gather:'LOOKUP',position:'FIXED FORMULA',matmul:'MATMUL',qk:'DOT PRODUCT',ln:'LAYER NORM',softmax:'SOFTMAX',add:'ELEMENT-WISE ADD',bias:'BIAS ADD',scale:'SCALE',mask:'MASK',slice:'SPLIT HEADS',concat:'CONCAT',gelu:'GELU',loss:'CROSS ENTROPY',grad_logits:'GRADIENT',grad_head:'GRADIENT'}[t.op]||'ACTIVATION';
+ switch(t.op){
+  case 'parameter':{
+   section('它是模型参数，不是临时计算结果',`<p class="inspect-note">初始值由本实验人工设置为易读小数。真实模型通常从初始化出发，通过训练更新。一个参数会被多个 token / 样本重复使用。</p>${box(`初始示例值：${f(E.defaults[id][i][j])}<br>当前参数值：${f(value)}`)}`);
+   section('修改参数，重新计算整条链路',`<label class="inspect-note" for="param-value">允许范围 [−10,10]；回车或失焦后应用。</label><input id="param-value" class="param-input" type="number" min="-10" max="10" step="0.05" data-param="${id},${i},${j}" value="${value}"><button class="btn small" data-reset-param="${id},${i},${j}">恢复此格的初始值</button>`);
+   if(id==='W_vocab'&&state.lastUpdate){const u=state.lastUpdate;section('这个参数最近一次 SGD 更新',box(`${f(u.old[i][j])} − 0.20 × (${f(u.grad[i][j])})<br>= <strong>${f(value)}</strong>`));}
+   break;
+  }
+  case 'gather':section('token ID 决定取哪一行',box(`input_ids[${i}] = ${t.ids[i]}<br>token = ${esc(V[t.ids[i]])}<br>${xy(id,i,j)} = E[${t.ids[i]},${j}]<br>= ${f(value)}`));section('沿着上游继续查看',dep('E',t.ids[i],j,'查看 Embedding 表中的参数'));break;
+  case 'position':{
+   const k=Math.floor(j/2),den=10000**(2*k/4),angle=i/den,fn=j%2?'cos':'sin';
+   section('选择位置与维度',box(`位置 p = ${i}<br>维度 d = ${j}；k = floor(d/2) = ${k}<br>D = 4；使用 ${fn}（弧度）`));
+   section('计算频率分母与角度',calc(`10000<sup>2×${k}/4</sup> = ${f(den)}<br>角度 = ${i} / ${f(den)}<br>　　= ${f(angle)}`));
+   section('代入三角函数',box(`${fn}(${f(angle)}) = ${f(value)}`));break;
+  }
+  case 'add':case 'bias':{
+   const r=t.op==='bias'?0:i,a=num(t.A,i,j),b=num(t.B,r,j);
+   section('拿出对应位置的两个数',calc(`${xy(t.A,i,j)} = ${f(a)}<br>${xy(t.B,r,j)} = ${f(b)}`));
+   section(t.op==='bias'?'同一行偏置广播到各个 token':'逐元素相加，不拼接维度',box(`${f(a)} + (${f(b)})<br>= <strong>${f(value)}</strong>`));
+   section('追溯这两个数',`<div class="dep-buttons">${dep(t.A,i,j)}${dep(t.B,r,j)}</div>`);break;
+  }
+  case 'scale':{
+   const a=num(t.A,i,j);section('先取上游数值',box(`${xy(t.A,i,j)} = ${f(a)}`));
+   let reason=id==='Pscaled'?`位置强度 α = ${f(state.alpha)}`:id==='Ltau'?`系数 = 1 / τ = 1 / ${f(state.tau)}`:t.dh?`系数 = ${state.scaled?'1 / √'+t.dh:'1（缩放关闭）'}`:`系数 = ${f(t.scalar)}`;
+   section('缩放系数',calc(reason+`<br>实际系数 = ${f(t.scalar)}`));section('相乘',box(`${f(a)} × ${f(t.scalar)}<br>= ${f(value)}`));section('继续查看上游',dep(t.A,i,j));break;
+  }
+  case 'matmul':case 'qk':case 'grad_head':{
+   const trip=[];
+   if(t.op==='grad_head'){for(let k=0;k<state.ids.length;k++)trip.push({a:t.A,ar:k,ac:i,b:t.B,br:k,bc:j,k});}
+   else for(let k=0;k<tensor(t.A)[i].length;k++)trip.push({a:t.A,ar:i,ac:k,b:t.B,br:t.op==='qk'?j:k,bc:t.op==='qk'?k:j,k});
+   const sig=t.op==='qk'?`Σd ${t.A}[${i},d] × ${t.B}[${j},d]`:t.op==='grad_head'?`Σt H[t,${i}] × dLogits[t,${j}]`:`Σk ${t.A}[${i},k] × ${t.B}[k,${j}]`;
+   section('先确定相乘的是哪一行、哪一列',box(sig)+`<p class="inspect-note">共 ${trip.length} 对数相乘，再全部相加。${t.op==='qk'?'K 原矩阵的第 '+j+' 行，就是转置后的第 '+j+' 列。':''}</p>`);
+   section('把所有乘法逐项展开',calc(trip.map(p=>{const a=num(p.a,p.ar,p.ac),b=num(p.b,p.br,p.bc);return `<span class="term"><span class="tiny-label">${esc(xy(p.a,p.ar,p.ac))} · ${esc(xy(p.b,p.br,p.bc))}</span><br>${f(a)} × (${f(b)})<br> = ${f(a*b)}</span>`}).join('')));
+   section('加起来，得到这个元素',box(trip.map(p=>`(${f(num(p.a,p.ar,p.ac)*num(p.b,p.br,p.bc))})`).join(' + ')+`<div class="calc-result">= ${f(value)}</div>`));
+   section('选择一个上游元素继续展开',`<div class="dep-buttons">${trip.map(p=>dep(p.a,p.ar,p.ac)).join('')}${trip.map(p=>dep(p.b,p.br,p.bc)).join('')}</div>`);break;
+  }
+  case 'ln':{
+   const r=tensor(t.A)[i],s=t.stats[i],g=num(t.g,0,j),b=num(t.b,0,j);
+   section('整行一起计算均值 μ',box(`x = [${r.map(f).join(', ')}]<br><br>μ = (${r.map(x=>`(${f(x)})`).join(' + ')}) / 4<br>= ${f(s.mean)}`));
+   section('计算总体方差 σ²',box(`σ² = Σd (x[d] − μ)² / 4<br><br>= [${r.map(x=>`(${f(x)} − (${f(s.mean)}))²`).join(' + ')}] / 4<br><br>= [${r.map(x=>f((x-s.mean)**2)).join(' + ')}] / 4<br>= ${f(s.variance)}`));
+   section('加 ε，再开方',box(`ε = 0.00001<br>√(σ² + ε)<br>= √(${f(s.variance)} + 0.00001)<br>= ${f(s.den)}`));
+   section(`处理第 ${j} 个特征，再乘 γ 加 β`,box(`x̂ = (${f(r[j])} − (${f(s.mean)})) / ${f(s.den)}<br>= ${f((r[j]-s.mean)/s.den)}<br><br>y = x̂ × γ[${j}] + β[${j}]<br>= ${f((r[j]-s.mean)/s.den)} × ${f(g)} + (${f(b)})<br>= <strong>${f(value)}</strong>`));
+   section('继续查看输入与仿射参数',`<div class="dep-buttons">${dep(t.A,i,j)}${dep(t.g,0,j)}${dep(t.b,0,j)}</div>`);break;
+  }
+  case 'slice':section('按头拆分特征列',box(`${xy(id,i,j)}<br>= ${t.A}[${i}, ${j} + ${t.offset}]<br>= ${xy(t.A,i,j+t.offset)}<br>= ${f(value)}`));section('这里只改变索引，不计算新数值',`<p class="inspect-note">reshape / transpose 是维度重排，拆头不是重新训练一套完整模型。</p>${dep(t.A,i,j+t.offset)}`);break;
+  case 'concat':{
+   const h=Math.floor(j/t.dh),c=j%t.dh,a=t.parts[h];section('这个输出列来自哪个头？',box(`完整特征列 j = ${j}<br>dₕ = ${t.dh}<br>Head = floor(${j} / ${t.dh}) = ${h}<br>头内列 = ${j} mod ${t.dh} = ${c}`));section('沿特征维拷贝，而不是求和',box(`${xy(id,i,j)} = ${xy(a,i,c)}<br>= ${f(value)}`)+`<div class="dep-buttons">${dep(a,i,c)}</div>`);break;
+  }
+  case 'mask':{
+   section('检查可见性',box(`查询位置 i = ${i}<br>Key 位置 j = ${j}<br>${!t.causal?'因果 Mask 已关闭':j>i?`${j} > ${i}，属于未来位置`:`${j} ≤ ${i}，允许访问`}`));
+   section('决定保留分数还是屏蔽',box(t.causal&&j>i?`${f(num(t.A,i,j))} → −∞<br>后续 exp(−∞) = 0`:`保留 ${xy(t.A,i,j)}<br>= ${f(value)}`));section('查看原始分数',dep(t.A,i,j));break;
+  }
+  case 'softmax':{
+   const r=tensor(t.A)[i],m=Math.max(...r),ex=r.map(x=>Math.exp(x-m)),sum=ex.reduce((a,b)=>a+b,0);
+   section('先找这一整行的最大分数',box(`m = max([${r.map(f).join(', ')}])<br>= ${f(m)}`));
+   section('减去同一个最大值，再取指数',calc(r.map((x,k)=>`<span class="term">e${k} = exp(${f(x)} − (${f(m)}))<br>　= exp(${f(x-m)}) = ${f(ex[k])}</span>`).join('')));
+   section('用整行指数和做分母',box(`Z = ${ex.map(f).join(' + ')}<br>= ${f(sum)}`));
+   section(`只取第 ${j} 项，除以 Z`,box(`${f(ex[j])} / ${f(sum)}<br>= <strong>${f(value)}</strong><br>= ${pct(value)}`));
+   section('继续查看这一行的上游分数',`<div class="dep-buttons">${r.map((_,k)=>dep(t.A,i,k)).join('')}</div>`);break;
+  }
+  case 'gelu':{
+   const x=num(t.A,i,j),x3=x*x*x,u=x+.044715*x3,c=Math.sqrt(2/Math.PI),v=c*u,th=Math.tanh(v);
+   section('代入 tanh 近似的输入',box(`x = ${f(x)}<br>x³ = ${f(x3)}<br>x + 0.044715x³ = ${f(u)}`));
+   section('缩放，再计算 tanh',box(`√(2/π) = ${f(c)}<br>u = ${f(c)} × ${f(u)} = ${f(v)}<br>tanh(u) = ${f(th)}`));
+   section('乘回原输入',box(`0.5 × ${f(x)} × (1 + (${f(th)}))<br>= ${f(value)}`));section('继续查看激活前的输入',dep(t.A,i,j));break;
+  }
+  case 'loss':{
+   const y=t.targets[i],p=num(t.A,i,y);section('标签决定取哪个概率',box(`位置 ${i} 的下一 token 标签<br>target = ${y} · ${esc(V[y])}<br>p_train[${i},${y}] = ${f(p)}`));section('取自然对数，再取负号',box(`−ln(p) = ${f(value)}<br>其中 p ≈ ${f(p)}`));section('程序如何避免概率太小造成 log(0)',box(`Lᵢ = logsumexp(Logits[i,:])<br>　 − Logits[i,target]<br><br>内部使用这一等价的稳定表达式，<br>而不是对舍入后的概率取对数。`));section('平均后才是全序列的 Loss',box(`L = (L₀ + … + L${state.ids.length-1}) / ${state.ids.length}<br>= ${f(model.loss)}`));section('继续追溯标签对应的概率',dep(t.A,i,y));break;
+  }
+  case 'grad_logits':{
+   const p=num(t.A,i,j),target=t.targets[i],one=j===target?1:0,T=state.ids.length;
+   section('Softmax + 交叉熵的合成梯度',box('dL / dLogits[i,j]<br>= (p[i,j] − one_hot(target)[j]) / T'));
+   section('带入目标与当前位置',box(`候选 j = ${j} · ${esc(V[j])}<br>正确标签 = ${target} · ${esc(V[target])}<br>指示值 1[j=target] = ${one}<br>T = ${T}`));
+   section('相减，再按有效位置数平均',box(`(${f(p)} − ${one}) / ${T}<br>= ${f(value)}`));section('继续查看当前概率',dep(t.A,i,j));break;
+  }
+ }
+ $('#inspector-body').innerHTML=`<div class="inspect-label">${esc(xy(id,i,j))}<span class="op-type">${typ}</span></div><div class="big-number">${fmt(value,5)}</div><p class="inspect-note">${esc(note)}。下标均从 0 开始。</p>${parts.join('')}<div class="inspector-foot">表格展示 ${state.precision} 位小数，推导展示 5 位小数；计算始终使用未舍入值。用屏幕上的舍入数手算，末位可能略有不同。</div>`;
+ updateHighlights();
+}
+function defaultSelection(){const r=state.row,h=state.head;const defs=[['A'+h,r,Math.min(1,r)],['Emb',r,0],['X',r,0],['N1',r,0],['Q',r,0],['S'+h,r,0],['A'+h,r,Math.min(1,r)],['Head'+h,r,0],['R1',r,0],['G',r,0],['Hfinal',r,0],['Prob',r,0],['Loss',r,0],['Q',r,0]];let [id,i,j]=defs[state.step];if(state.step===11){const p=tensor('Prob')[r];j=p.indexOf(Math.max(...p))}state.sel={id,i,j}}
+function calculate(){state.row=Math.min(state.row,state.ids.length-1);state.head=Math.min(state.head,state.heads-1);model=E.forward(state)}
+function resetLearningHistory(){state.history=[];state.trainSteps=0;state.lastUpdate=null}
+function renderToolbar(){
+ $('#lab-toolbar').innerHTML=`<div class="toolbar-label">LIVE INPUT<b>实验输入</b></div><div class="token-controls">${state.ids.map((id,i)=>`<div class="token-control${state.row===i?' focused':''}"><label>pos ${i}</label><select data-token="${i}" aria-label="修改位置 ${i} 的 token">${V.map((v,j)=>`<option value="${j}"${j===id?' selected':''}>${esc(v)}</option>`).join('')}</select></div>`).join('')}<button class="btn small" data-add-token title="增加输入 token" aria-label="增加输入 token"${state.ids.length>=6?' disabled':''}>＋</button><button class="btn small" data-remove-token title="删除最后一个输入 token" aria-label="删除最后一个输入 token"${state.ids.length<=1?' disabled':''}>−</button></div><span class="toolbar-sep"></span><label class="note-inline">H <select class="toolbar-select" data-key="heads" aria-label="注意力头数"><option value="1"${state.heads===1?' selected':''}>1 头 / dₕ=4</option><option value="2"${state.heads===2?' selected':''}>2 头 / dₕ=2</option></select></label><label class="note-inline">追踪 <select class="toolbar-select" data-key="row" aria-label="选择观察位置">${state.ids.map((id,i)=>`<option value="${i}"${state.row===i?' selected':''}>${i} · ${esc(V[id])}</option>`).join('')}</select></label><div class="live-pill"><span class="status-dot"></span>浏览器内计算 · 无网络请求</div>`;
+}
+function render(){
+ calculate();document.body.classList.toggle('precise',state.precision===5);renderToolbar();
+ $('#nav').innerHTML=steps.map((s,i)=>`${[0,1,3,11,13].includes(i)?`<div class="nav-label">${({0:'LEARNING MAP',1:'输入表示',3:'TRANSFORMER BLOCK',11:'输出与训练',13:'继续深入'})[i]}</div>`:''}<button data-step="${i}" class="${state.step===i?'active':''}" aria-current="${state.step===i?'step':'false'}"><span class="nav-num">${String(i).padStart(2,'0')}</span><b>${s[0]}</b></button>`).join('');
+ $('#model-config').textContent=`B 1  ·  T ${state.ids.length}  ·  D 4  ·  H ${state.heads}`;
+ $('#precision-label').textContent=`${state.precision} 位小数`;
+ const s=steps[state.step];$('#stage-head').innerHTML=`<div><div class="eyebrow"><span>${state.step===0?'START HERE':'STEP '+String(state.step).padStart(2,'0')}</span>${s[1]}</div><h1>${s[2]}</h1><p>${s[3]}</p></div><div class="stage-counter"><strong>${String(state.step).padStart(2,'0')}</strong> / 13</div>`;
+ $('#progress').style.width=`${100*(state.step+1)/14}%`;
+ $('#stage-content').innerHTML=renderers[state.step]();
+ $('#step-footer').innerHTML=`<button class="btn" data-step="${Math.max(0,state.step-1)}"${state.step===0?' disabled':''}>← 上一步</button><span class="hint">可用键盘 ← → 切换步骤 · 点击矩阵数字展开推导</span><button class="btn primary" data-step="${state.step===13?0:state.step+1}">${state.step===13?'回到全局链路 ↺':steps[state.step+1][0]+' →'}</button>`;
+ renderInspector();
+}
+function go(step){state.step=Math.max(0,Math.min(13,step));visited.add(state.step);calculate();defaultSelection();render();$('#sidebar').classList.remove('open');window.scrollTo({top:0,behavior:'instant'});}
+function inspect(id,i,j){state.sel={id,i,j};renderInspector();if(window.innerWidth<=1000)$('#inspector').scrollIntoView({behavior:'smooth',block:'start'})}
+function toast(text){const el=$('#toast');el.textContent=text;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3300)}
+function train(n){if(!state.causal)return;if(!state.history.length)state.history.push(model.loss);for(let k=0;k<n;k++){const m=E.forward(state),old=E.clone(state.weights.W_vocab),grad=m.t.GradHead.data;state.weights.W_vocab=old.map((r,i)=>r.map((v,j)=>v-.2*grad[i][j]));const newer=E.forward(state);state.lastUpdate={old,grad,before:m.loss,after:newer.loss};state.history.push(newer.loss);state.trainSteps++}calculate();defaultSelection();render();toast(`已完成 ${n} 步输出头 SGD；主干权重保持不变。`)}
+function download(name,content,type='text/plain;charset=utf-8'){const blob=new Blob([content],{type}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}
+function config(){return {ids:state.ids,heads:state.heads,alpha:state.alpha,causal:state.causal,scaled:state.scaled,tau:state.tau,target:state.target,weights:state.weights}}
+function pythonSource(){return `# Transformer Lab — reproducible snapshot of the current browser model.
+# Python 3 + PyTorch. No pretrained models, no external data.
+# Matrix convention: W is [in_features, out_features], so use x @ W directly.
+# All parameters require gradients here; the webpage's training button updates
+# ONLY W_vocab. This script demonstrates a full backward pass without updating.
+import json
+import math
+from pathlib import Path
+try:
+    import torch
+    import torch.nn.functional as F
+except ImportError as exc:
+    raise SystemExit("Please install PyTorch: python -m pip install torch") from exc
+
+CONFIG = json.loads(r'''${JSON.stringify(config())}''')
+torch.set_default_dtype(torch.float64)
+w = {k: torch.tensor(v, dtype=torch.float64, requires_grad=True) for k, v in CONFIG["weights"].items()}
+ids = torch.tensor(CONFIG["ids"], dtype=torch.long)
+T, D, HEADS = len(ids), 4, CONFIG["heads"]
+DH = D // HEADS
+trace = dict(w)
+def put(name, value):
+    trace[name] = value
+    return value
+
+def ln(name, x, gamma, beta):
+    return put(name, F.layer_norm(x, (D,), w[gamma][0], w[beta][0], eps=1e-5))
+
+emb = put("Emb", w["E"][ids])
+p = torch.arange(T, dtype=torch.float64)
+pos = put("P", torch.stack([p.sin(), p.cos(), (p/100).sin(), (p/100).cos()], dim=1))
+pos_scaled = put("Pscaled", CONFIG["alpha"] * pos)
+x = put("X", emb + pos_scaled)
+n1 = ln("N1", x, "gamma1", "beta1")
+q, k, v = [put(name, n1 @ w["W" + name]) for name in ("Q", "K", "V")]
+head_outputs = []
+for h in range(HEADS):
+    qh = put("Q" + str(h), q[:, h*DH:(h+1)*DH])
+    kh = put("K" + str(h), k[:, h*DH:(h+1)*DH])
+    vh = put("V" + str(h), v[:, h*DH:(h+1)*DH])
+    raw = put("Sraw" + str(h), qh @ kh.T)
+    scores = put("S" + str(h), raw / math.sqrt(DH) if CONFIG["scaled"] else raw)
+    if CONFIG["causal"]:
+        future = torch.triu(torch.ones(T, T, dtype=torch.bool), diagonal=1)
+        scores = scores.masked_fill(future, float("-inf"))
+    masked = put("M" + str(h), scores)
+    attn_weights = put("A" + str(h), F.softmax(masked, dim=-1))
+    head_outputs.append(put("Head" + str(h), attn_weights @ vh))
+joined = put("Concat", torch.cat(head_outputs, dim=-1))
+a = put("Attn", joined @ w["WO"])
+x1 = put("R1", x + a)
+n2 = ln("N2", x1, "gamma2", "beta2")
+u_linear = put("Ulinear", n2 @ w["W1"])
+u = put("U", u_linear + w["bMLP1"])
+g = put("G", F.gelu(u, approximate="tanh"))
+f_linear = put("Flinear", g @ w["W2"])
+ff = put("FF", f_linear + w["bMLP2"])
+x2 = put("R2", x1 + ff)
+h_final = ln("Hfinal", x2, "gammaF", "betaF")
+logits = put("Logits", h_final @ w["W_vocab"])
+l_tau = put("Ltau", logits / CONFIG["tau"])
+probs = put("Prob", F.softmax(l_tau, dim=-1))
+p_train = put("P_train", F.softmax(logits, dim=-1))
+targets = torch.tensor(CONFIG["ids"][1:] + [CONFIG["target"]], dtype=torch.long)
+losses = F.cross_entropy(logits, targets, reduction="none")
+put("Loss", losses[:, None])
+loss = losses.mean()
+grad_logits = put("GradLogits", (p_train - F.one_hot(targets, 8)) / T)
+grad_head = put("GradHead", h_final.T @ grad_logits)
+loss.backward()
+
+print("Shape of logits:", tuple(logits.shape), "(batch dimension 1 omitted)")
+print("Last-position probabilities:", probs[-1].detach().tolist())
+print("Mean cross-entropy:", loss.item())
+print("\\nFull backward: parameter gradient norms")
+for name, param in w.items():
+    print(f"{name:12s} shape={str(tuple(param.shape)):10s} grad_norm={param.grad.norm().item():.10f}")
+assert torch.allclose(w["W_vocab"].grad, grad_head, atol=1e-12, rtol=1e-10)
+print("Output-head analytical gradient matches PyTorch autograd.")
+if not CONFIG["causal"]:
+    print("WARNING: causal mask is disabled; this is not valid autoregressive training.")
+
+def json_safe(value):
+    if isinstance(value, list):
+        return [json_safe(x) for x in value]
+    if isinstance(value, float) and not math.isfinite(value):
+        return "-Infinity" if value < 0 else "Infinity" if value > 0 else "NaN"
+    return value
+payload = {"loss": loss.item(), "tensors": {k: json_safe(v.detach().tolist()) for k,v in trace.items()}}
+Path("forward_trace_torch.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8")
+print("Saved all intermediate tensors to forward_trace_torch.json")
+`}
+function bind(){
+ document.addEventListener('click',ev=>{
+  const btn=ev.target.closest('button');if(!btn||btn.disabled)return;
+  if(btn.dataset.step!==undefined){go(Number(btn.dataset.step));return;}
+  if(btn.dataset.inspect){const [id,i,j]=btn.dataset.inspect.split(',');inspect(id,Number(i),Number(j));return;}
+  if(btn.dataset.row!==undefined){state.row=Number(btn.dataset.row);calculate();defaultSelection();render();return;}
+  if(btn.dataset.head!==undefined){state.head=Number(btn.dataset.head);calculate();defaultSelection();render();return;}
+  if(btn.hasAttribute('data-menu')){$('#sidebar').classList.toggle('open');return;}
+  if(btn.hasAttribute('data-add-token')){if(state.ids.length<6){state.ids.push(3);state.row=state.ids.length-1;resetLearningHistory();calculate();defaultSelection();render()}return;}
+  if(btn.hasAttribute('data-remove-token')){if(state.ids.length>1){state.ids.pop();state.row=Math.min(state.row,state.ids.length-1);resetLearningHistory();calculate();defaultSelection();render()}return;}
+  if(btn.hasAttribute('data-precision')){state.precision=state.precision===3?5:3;render();return;}
+  if(btn.hasAttribute('data-reset')){const step=state.step;Object.assign(state,{ids:[0,1,2],row:2,heads:1,head:0,alpha:1,causal:true,scaled:true,tau:1,target:6,weights:E.clone(E.defaults),history:[],trainSteps:0,lastUpdate:null});go(step);toast('已恢复初始输入、全部参数与实验开关。');return;}
+  if(btn.dataset.resetParam){const [id,i,j]=btn.dataset.resetParam.split(',');state.weights[id][+i][+j]=E.defaults[id][+i][+j];resetLearningHistory();render();return;}
+  if(btn.dataset.generate){if(state.ids.length>=6)return;const p=tensor('Prob').at(-1);let idx=p.indexOf(Math.max(...p));if(btn.dataset.generate==='sample'){let u=Math.random();idx=p.length-1;for(let j=0;j<p.length;j++){u-=p[j];if(u<=0){idx=j;break}}}state.ids.push(idx);state.row=state.ids.length-1;resetLearningHistory();calculate();defaultSelection();render();toast(`已将“${V[idx]}”接到输入末尾，并重新计算完整前缀。${idx===7?'本次得到结束标记。':''}`);return;}
+  if(btn.dataset.train){train(Number(btn.dataset.train));return;}
+  if(btn.hasAttribute('data-reset-head')){state.weights.W_vocab=E.clone(E.defaults.W_vocab);resetLearningHistory();render();toast('仅输出头已重置，其他参数与输入保持不变。');return;}
+  if(btn.dataset.export==='python'){download('transformer_snapshot.py',pythonSource());toast('已导出当前配置的 PyTorch 复现脚本。');return;}
+  if(btn.dataset.export==='json'){download('transformer_trace.json',JSON.stringify({config:config(),loss:model.loss,tensors:Object.fromEntries(Object.entries(model.t).map(([k,v])=>[k,v.data]))},(_,v)=>v===-Infinity?'-Infinity':v,2),'application/json;charset=utf-8');toast('已导出参数、输入与所有中间矩阵。');return;}
+ });
+ document.addEventListener('change',ev=>{
+  const el=ev.target;if(el.dataset.token!==undefined){state.ids[Number(el.dataset.token)]=Number(el.value);resetLearningHistory();calculate();defaultSelection();render();return;}
+  if(el.dataset.key){const k=el.dataset.key;state[k]=Number(el.value);if(k==='heads'||k==='target')resetLearningHistory();calculate();defaultSelection();render();return;}
+  if(el.dataset.check){state[el.dataset.check]=el.checked;resetLearningHistory();calculate();defaultSelection();render();return;}
+  if(el.dataset.range){state[el.dataset.range]=Number(el.value);if(el.dataset.range!=='tau')resetLearningHistory();calculate();render();return;}
+  if(el.dataset.param){const [id,i,j]=el.dataset.param.split(',');let x=Number(el.value);if(!Number.isFinite(x)||el.value===''){toast('请输入一个有效的有限数值。');renderInspector();return;}x=Math.min(10,Math.max(-10,x));state.weights[id][+i][+j]=x;resetLearningHistory();render();toast(`${id}[${i},${j}] 已更新，所有下游结果已重算。`);return;}
+ });
+ document.addEventListener('input',ev=>{
+  const el=ev.target;if(!el.dataset.range)return;
+  state[el.dataset.range]=Number(el.value);
+  const out=document.querySelector(`[data-output="${el.dataset.range}"]`);
+  if(out)out.textContent=Number(el.value).toFixed(2);
+  calculate();
+  // Preserve the active slider DOM node while updating every displayed value.
+  const limits={};
+  document.querySelectorAll('.cell[data-inspect]').forEach(cell=>{
+    const [id,ri,ci]=cell.dataset.inspect.split(','),v=tensor(id)[+ri][+ci];
+    if(limits[id]===undefined)limits[id]=Math.max(...tensor(id).flat().filter(Number.isFinite).map(Math.abs),.01);
+    cell.textContent=fmt(v);cell.style.cssText=heat(v,limits[id],/^(A\d|Prob|P_train)$/.test(id));
+    cell.setAttribute('aria-label',`展开 ${xy(id,+ri,+ci)} 的计算，数值 ${fmt(v)}`);
+  });
+  const p=tensor('Prob')[state.row];
+  document.querySelectorAll('.prob-row').forEach((row,j)=>{row.querySelector('.bar-fill').style.width=`${100*p[j]}%`;row.querySelector('.prob-number').textContent=pct(p[j]);});
+  renderInspector();
+ });
+ document.addEventListener('keydown',ev=>{if(['INPUT','SELECT','TEXTAREA'].includes(ev.target.tagName)||ev.altKey||ev.metaKey||ev.ctrlKey)return;if(ev.key==='ArrowRight'&&state.step<13){ev.preventDefault();go(state.step+1)}if(ev.key==='ArrowLeft'&&state.step>0){ev.preventDefault();go(state.step-1)}if(ev.key==='Escape')$('#sidebar').classList.remove('open')});
+}
+calculate();bind();render();
+window.TransformerLab={state,get model(){return model},go,render,inspect,train,pythonSource,config};
+})();
+
+</script>
+</body></html>
