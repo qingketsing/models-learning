@@ -36,3 +36,13 @@ dist/
 Thumbs.db
 
 # Keep pyproject.toml, uv.lock and .python-version under version control.
+
+# Reference project uses the same generated directories
+/reference_impl/data/
+/reference_impl/datasets/
+/reference_impl/checkpoints/
+/reference_impl/outputs/
+/reference_impl/runs/
+# Encoded datasets are generated, not learning source
+*.bin
+*.bin.tmp

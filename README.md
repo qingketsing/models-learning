@@ -2,7 +2,34 @@
 
 通过手算、矩阵可视化和 PyTorch 填空练习，理解 Transformer 从 token 输入到预测、训练与生成的完整过程。
 
-当前仓库保留学习材料和可重新填写的工作册。2026-09-30 已清除工作册中填写过的答案，恢复 **9 个关卡、20 处核心 TODO**；模块声明、输入检查、提示、数据和检查程序仍保留。此前的 `lesson_01.py`、`lesson2.py`、`lesson3.py` 独立练习脚本已移除。
+当前仓库保留学习材料、旧 Transformer 工作册，以及新增的 GPT 到训练工作册。2026-09-30 已清除工作册中填写过的答案，恢复 **9 个关卡、20 处核心 TODO**；模块声明、输入检查、提示、数据和检查程序仍保留。此前的 `lesson_01.py`、`lesson2.py`、`lesson3.py` 独立练习脚本已移除。
+
+## 从零重写 GPT 到真实训练（新增）
+
+从 `tiny_gpt` 文件夹开始的完整项目已整理为 **18 个关卡、106 处 TODO**。仓库根目录是可填写的练习；`reference_impl/` 保留完整参考实现。脚本参数、校验、运行管理和检查程序已经提供，核心计算与数据处理由你填写。
+
+1. [从零到训练的详细学习指南](docs/GPT从零到训练_学习指南.md)：每关的原理、矩阵形状、实现路径、局部示例、常见错误和过关标准。
+2. [全部 TODO 索引](docs/GPT_TODO索引.md)：按编号定位文件与函数。
+3. [参考实现运行说明](reference_impl/README.md)：核对答案或运行已完成的版本。
+
+```bash
+uv sync --locked
+uv pip install --python .venv/bin/python -r requirements-data.txt
+source .venv/bin/activate
+python scripts/check_gpt_workbook.py 01
+```
+
+首次显示 `[待填写]` 是预期结果。填完一关就检查对应编号；遇到实际错误加 `--trace`。完整检查：
+
+```bash
+python scripts/check_gpt_workbook.py all
+# 验证完整参考答案；不代表练习已经完成
+python scripts/check_gpt_workbook.py all --reference
+```
+
+学习顺序：Embedding → LayerNorm → mask → Attention → MLP/Block → GPT → Dataset → 训练/验证 → 累积/裁剪 → checkpoint → 学习率 → 字符 tokenizer → device → BPE → 二进制数据 → 长训练保存 → 生成。
+
+本地学习在 CPU 即可；真实数据、CUDA 配置和长训练见学习指南后半部分。GPU 节点使用已有 CUDA PyTorch 并补装 `requirements-data.txt`，不要把仓库的 CPU 源安装命令直接套到节点。历史操作记录也保留在 [数据处理文档](docs/tinystories-training.md) 和 [长训练文档](docs/tinystories-long-training.md)；其中“已生成”“已执行”描述历史节点状态，不表示新克隆包含数据或权重。
 
 ## 先看可视化
 
@@ -23,7 +50,7 @@ HTML 是小型教学演示，采用正弦位置编码和 Pre-Norm Decoder-only �
 环境使用 Python 3.12 与 [uv](https://docs.astral.sh/uv/)。依赖已在 `pyproject.toml` 和 `uv.lock` 中定义，练习可以在 CPU 上运行。
 
 ```bash
-git clone --branch codex/learning-foundations git@github.com:qingketsing/models-learning.git
+git clone --branch main git@github.com:qingketsing/models-learning.git
 cd models-learning
 uv sync --locked
 uv run python -m transformer_workbook.check 01

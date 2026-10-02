@@ -1,0 +1,850 @@
+[
+  {
+    "file": "tiny_gpt/embeddings.py",
+    "id": "01.01",
+    "fn": "GPTEmbedding.__init__",
+    "kind": "assign",
+    "key": "self.token",
+    "hint": "创建 nn.Embedding(V,D)，它是模块，不是直接参与 @ 的矩阵"
+  },
+  {
+    "file": "tiny_gpt/embeddings.py",
+    "id": "01.02",
+    "fn": "GPTEmbedding.__init__",
+    "kind": "assign",
+    "key": "self.position",
+    "hint": "创建 nn.Embedding(max_len,D)，位置参数也参与训练"
+  },
+  {
+    "file": "tiny_gpt/embeddings.py",
+    "id": "01.03",
+    "fn": "GPTEmbedding.forward",
+    "kind": "assign",
+    "key": "token_vectors",
+    "hint": "调用 token 查表，得到 [B,T,D]"
+  },
+  {
+    "file": "tiny_gpt/embeddings.py",
+    "id": "01.04",
+    "fn": "GPTEmbedding.forward",
+    "kind": "assign",
+    "key": "positions",
+    "hint": "torch.arange(T)，设备与 input_ids 相同"
+  },
+  {
+    "file": "tiny_gpt/embeddings.py",
+    "id": "01.05",
+    "fn": "GPTEmbedding.forward",
+    "kind": "assign",
+    "key": "position_vectors",
+    "hint": "查位置表并补 batch 轴：[T,D]→[1,T,D]"
+  },
+  {
+    "file": "tiny_gpt/embeddings.py",
+    "id": "01.06",
+    "fn": "GPTEmbedding.forward",
+    "kind": "return",
+    "key": "token_vectors + position_vectors",
+    "hint": "相加并广播，返回 [B,T,D]"
+  },
+  {
+    "file": "tiny_gpt/normalization.py",
+    "id": "02.01",
+    "fn": "LayerNorm.__init__",
+    "kind": "assign",
+    "key": "self.weight",
+    "hint": "用 nn.Parameter 包装全 1 的 [D] 张量"
+  },
+  {
+    "file": "tiny_gpt/normalization.py",
+    "id": "02.02",
+    "fn": "LayerNorm.__init__",
+    "kind": "assign",
+    "key": "self.bias",
+    "hint": "用 nn.Parameter 包装全 0 的 [D] 张量"
+  },
+  {
+    "file": "tiny_gpt/normalization.py",
+    "id": "02.03",
+    "fn": "LayerNorm.forward",
+    "kind": "assign",
+    "key": "mean",
+    "hint": "沿 dim=-1 求平均，keepdim=True"
+  },
+  {
+    "file": "tiny_gpt/normalization.py",
+    "id": "02.04",
+    "fn": "LayerNorm.forward",
+    "kind": "assign",
+    "key": "var",
+    "hint": "总体方差 correction=0，keepdim=True"
+  },
+  {
+    "file": "tiny_gpt/normalization.py",
+    "id": "02.05",
+    "fn": "LayerNorm.forward",
+    "kind": "assign",
+    "key": "normalized",
+    "hint": "减均值后除以 sqrt(var+eps)，eps 在根号内"
+  },
+  {
+    "file": "tiny_gpt/normalization.py",
+    "id": "02.06",
+    "fn": "LayerNorm.forward",
+    "kind": "assign",
+    "key": "output",
+    "hint": "逐元素乘 weight 加 bias；不能用 @"
+  },
+  {
+    "file": "tiny_gpt/masks.py",
+    "id": "03.01",
+    "fn": "causal_mask",
+    "kind": "assign",
+    "key": "mask",
+    "hint": "torch.ones 创建 bool [T,T]，再保留 diagonal=1 的上三角"
+  },
+  {
+    "file": "tiny_gpt/masks.py",
+    "id": "03.02",
+    "fn": "causal_mask",
+    "kind": "assign",
+    "key": "blocked",
+    "hint": "连续补两个前导轴：[T,T]→[1,1,T,T]"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.01",
+    "fn": "CausalSelfAttention.split_heads",
+    "kind": "assign",
+    "key": "split",
+    "hint": "先 reshape(B,T,H,Dh)，再交换 T、H；尺寸是整数"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.02",
+    "fn": "CausalSelfAttention.merge_heads",
+    "kind": "assign",
+    "key": "merged",
+    "hint": "先交换 H、T，再 reshape(B,T,H*Dh)"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.03",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "q",
+    "hint": "通过 q_proj 投影输入"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.04",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "k",
+    "hint": "通过 k_proj 投影输入"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.05",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "v",
+    "hint": "通过 v_proj 投影输入"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.06",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "scores",
+    "hint": "QKᵀ/sqrt(Dh)，仅交换 K 的最后两个轴"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.07",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "weights",
+    "hint": "沿 key 轴 dim=-1 做 softmax"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.08",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "context",
+    "hint": "weights @ v，加权汇总 value"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.09",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "output",
+    "hint": "合头之后必须经过 out_proj"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.10",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "q#2",
+    "hint": "调用 split_heads(q)，得到 [B,H,T,Dh]"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.11",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "k#2",
+    "hint": "调用 split_heads(k)"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.12",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "v#2",
+    "hint": "调用 split_heads(v)"
+  },
+  {
+    "file": "tiny_gpt/attention.py",
+    "id": "04.13",
+    "fn": "CausalSelfAttention.forward",
+    "kind": "assign",
+    "key": "scores#2",
+    "hint": "masked_fill(blocked,-inf)，True 位置概率应为 0"
+  },
+  {
+    "file": "tiny_gpt/mlp.py",
+    "id": "05.01",
+    "fn": "MLP.forward",
+    "kind": "assign",
+    "key": "hidden",
+    "hint": "先调用 up 扩维"
+  },
+  {
+    "file": "tiny_gpt/mlp.py",
+    "id": "05.02",
+    "fn": "MLP.forward",
+    "kind": "assign",
+    "key": "hidden#2",
+    "hint": "GELU 非线性，approximate=\"tanh\""
+  },
+  {
+    "file": "tiny_gpt/mlp.py",
+    "id": "05.03",
+    "fn": "MLP.forward",
+    "kind": "assign",
+    "key": "output",
+    "hint": "调用 down 回到 D"
+  },
+  {
+    "file": "tiny_gpt/block.py",
+    "id": "05.04",
+    "fn": "TransformerBlock.forward",
+    "kind": "assign",
+    "key": "normalized",
+    "hint": "对输入 x 使用 norm1"
+  },
+  {
+    "file": "tiny_gpt/block.py",
+    "id": "05.05",
+    "fn": "TransformerBlock.forward",
+    "kind": "assign",
+    "key": "attention_output",
+    "hint": "归一化结果输入 attention"
+  },
+  {
+    "file": "tiny_gpt/block.py",
+    "id": "05.06",
+    "fn": "TransformerBlock.forward",
+    "kind": "assign",
+    "key": "residual",
+    "hint": "原始 x 加 attention 输出"
+  },
+  {
+    "file": "tiny_gpt/block.py",
+    "id": "05.07",
+    "fn": "TransformerBlock.forward",
+    "kind": "assign",
+    "key": "normalized#2",
+    "hint": "第一次残差结果输入 norm2"
+  },
+  {
+    "file": "tiny_gpt/block.py",
+    "id": "05.08",
+    "fn": "TransformerBlock.forward",
+    "kind": "assign",
+    "key": "mlp_output",
+    "hint": "输入 mlp"
+  },
+  {
+    "file": "tiny_gpt/block.py",
+    "id": "05.09",
+    "fn": "TransformerBlock.forward",
+    "kind": "assign",
+    "key": "output",
+    "hint": "第一次残差结果加 mlp 输出"
+  },
+  {
+    "file": "tiny_gpt/model.py",
+    "id": "06.01",
+    "fn": "GPT.__init__",
+    "kind": "assign",
+    "key": "self.embedding",
+    "hint": "创建 GPTEmbedding"
+  },
+  {
+    "file": "tiny_gpt/model.py",
+    "id": "06.02",
+    "fn": "GPT.__init__",
+    "kind": "assign",
+    "key": "self.blocks",
+    "hint": "ModuleList 中独立创建每一层 Block"
+  },
+  {
+    "file": "tiny_gpt/model.py",
+    "id": "06.03",
+    "fn": "GPT.__init__",
+    "kind": "assign",
+    "key": "self.final_norm",
+    "hint": "创建最终 LayerNorm"
+  },
+  {
+    "file": "tiny_gpt/model.py",
+    "id": "06.04",
+    "fn": "GPT.__init__",
+    "kind": "assign",
+    "key": "self.lm_head",
+    "hint": "Linear(D,V,bias=False)，V 是词表大小"
+  },
+  {
+    "file": "tiny_gpt/model.py",
+    "id": "06.05",
+    "fn": "GPT.forward",
+    "kind": "assign",
+    "key": "x",
+    "hint": "输入 embedding"
+  },
+  {
+    "file": "tiny_gpt/model.py",
+    "id": "06.06",
+    "fn": "GPT.forward",
+    "kind": "assign",
+    "key": "x#2",
+    "hint": "循环内调用当前 block 更新 x"
+  },
+  {
+    "file": "tiny_gpt/model.py",
+    "id": "06.07",
+    "fn": "GPT.forward",
+    "kind": "assign",
+    "key": "x#3",
+    "hint": "所有 block 后再归一化"
+  },
+  {
+    "file": "tiny_gpt/model.py",
+    "id": "06.08",
+    "fn": "GPT.forward",
+    "kind": "assign",
+    "key": "logits",
+    "hint": "lm_head 输出 [B,T,V]，不做 softmax"
+  },
+  {
+    "file": "training/data.py",
+    "id": "07.01",
+    "fn": "TokenDataset.__len__",
+    "kind": "return",
+    "key": "len(self.tokens) - self.seq_len",
+    "hint": "步长 1，长度为 N-T"
+  },
+  {
+    "file": "training/data.py",
+    "id": "07.02",
+    "fn": "TokenDataset.__getitem__",
+    "kind": "assign",
+    "key": "x",
+    "hint": "从 index 取 T 个 token"
+  },
+  {
+    "file": "training/data.py",
+    "id": "07.03",
+    "fn": "TokenDataset.__getitem__",
+    "kind": "assign",
+    "key": "y",
+    "hint": "起点后移一位，仍取 T 个 token"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "08.01",
+    "fn": "train_step",
+    "kind": "expr",
+    "key": "optimizer.zero_grad()",
+    "hint": "先清空上次梯度"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "08.02",
+    "fn": "train_step",
+    "kind": "assign",
+    "key": "logits",
+    "hint": "model(x) 得到 [B,T,V]"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "08.03",
+    "fn": "train_step",
+    "kind": "assign",
+    "key": "flat_logits",
+    "hint": "reshape(-1,V)"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "08.04",
+    "fn": "train_step",
+    "kind": "assign",
+    "key": "flat_targets",
+    "hint": "reshape(-1)"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "08.05",
+    "fn": "train_step",
+    "kind": "assign",
+    "key": "loss",
+    "hint": "交叉熵接收原始分数和 long 标签"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "08.06",
+    "fn": "train_step",
+    "kind": "expr",
+    "key": "loss.backward()",
+    "hint": "从标量 loss 反向传播"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "08.07",
+    "fn": "train_step",
+    "kind": "expr",
+    "key": "optimizer.step()",
+    "hint": "根据梯度更新参数"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "09.01",
+    "fn": "evaluate",
+    "kind": "body",
+    "key": null,
+    "hint": "使用 eval 和 no_grad；按目标 token 数加权求 loss；finally 恢复原训练模式；接口与例子见教程 09"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "10.01",
+    "fn": "clip_gradients",
+    "kind": "assign",
+    "key": "grad_norm",
+    "hint": "clip_grad_norm_，使用 error_if_nonfinite=True"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "10.02",
+    "fn": "train_accumulated_step",
+    "kind": "expr",
+    "key": "optimizer.zero_grad()",
+    "hint": "整组开始只清空一次"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "10.03",
+    "fn": "train_accumulated_step",
+    "kind": "assign",
+    "key": "logits",
+    "hint": "对当前小 batch 前向"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "10.04",
+    "fn": "train_accumulated_step",
+    "kind": "assign",
+    "key": "loss",
+    "hint": "展开 logits 和 y，计算平均交叉熵"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "10.05",
+    "fn": "train_accumulated_step",
+    "kind": "assign",
+    "key": "scaled_loss",
+    "hint": "按当前目标 token 数/整组 token 数缩放 loss"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "10.06",
+    "fn": "train_accumulated_step",
+    "kind": "expr",
+    "key": "scaled_loss.backward()",
+    "hint": "每个小 batch 独立 backward，梯度累积"
+  },
+  {
+    "file": "training/trainer.py",
+    "id": "10.07",
+    "fn": "train_accumulated_step",
+    "kind": "expr",
+    "key": "optimizer.step()",
+    "hint": "整组最后只更新一次"
+  },
+  {
+    "file": "training/checkpoint.py",
+    "id": "11.01",
+    "fn": "save_checkpoint",
+    "kind": "assign",
+    "key": "model_state",
+    "hint": "model.state_dict()"
+  },
+  {
+    "file": "training/checkpoint.py",
+    "id": "11.02",
+    "fn": "save_checkpoint",
+    "kind": "assign",
+    "key": "optimizer_state",
+    "hint": "optimizer.state_dict()"
+  },
+  {
+    "file": "training/checkpoint.py",
+    "id": "11.03",
+    "fn": "save_checkpoint",
+    "kind": "expr",
+    "key": "torch.save(checkpoint, temporary)",
+    "hint": "写入已提供的同目录临时路径；原子替换框架已提供"
+  },
+  {
+    "file": "training/checkpoint.py",
+    "id": "11.04",
+    "fn": "load_checkpoint",
+    "kind": "assign",
+    "key": "checkpoint",
+    "hint": "torch.load，map_location=\"cpu\"，weights_only=True"
+  },
+  {
+    "file": "training/checkpoint.py",
+    "id": "11.05",
+    "fn": "load_checkpoint",
+    "kind": "assign",
+    "key": "epoch",
+    "hint": "读取 epoch"
+  },
+  {
+    "file": "training/checkpoint.py",
+    "id": "11.06",
+    "fn": "load_checkpoint",
+    "kind": "assign",
+    "key": "global_step",
+    "hint": "读取 global_step"
+  },
+  {
+    "file": "training/checkpoint.py",
+    "id": "11.07",
+    "fn": "load_checkpoint",
+    "kind": "expr",
+    "key": "model.load_state_dict(checkpoint[\"model\"])",
+    "hint": "把参数复制到已创建的模型"
+  },
+  {
+    "file": "training/checkpoint.py",
+    "id": "11.08",
+    "fn": "load_checkpoint",
+    "kind": "expr",
+    "key": "optimizer.load_state_dict(checkpoint[\"optimizer\"])",
+    "hint": "恢复 Adam 动量和计数"
+  },
+  {
+    "file": "training/schedule.py",
+    "id": "12.01",
+    "fn": "get_lr",
+    "kind": "return",
+    "key": "base_lr * step / warmup_steps",
+    "hint": "预热：base_lr*step/warmup_steps"
+  },
+  {
+    "file": "training/schedule.py",
+    "id": "12.02",
+    "fn": "get_lr",
+    "kind": "return",
+    "key": "min_lr",
+    "hint": "计划末尾返回最小学习率"
+  },
+  {
+    "file": "training/schedule.py",
+    "id": "12.03",
+    "fn": "get_lr",
+    "kind": "assign",
+    "key": "progress",
+    "hint": "衰减进度，扣除预热阶段"
+  },
+  {
+    "file": "training/schedule.py",
+    "id": "12.04",
+    "fn": "get_lr",
+    "kind": "return",
+    "key": "base_lr + (min_lr - base_lr) * progress",
+    "hint": "从 base_lr 线性插值到 min_lr"
+  },
+  {
+    "file": "training/schedule.py",
+    "id": "12.05",
+    "fn": "set_lr",
+    "kind": "assign",
+    "key": "group[\"lr\"]",
+    "hint": "修改每个参数组字典，不是 optimizer.lr"
+  },
+  {
+    "file": "data_pipeline/tokenizer.py",
+    "id": "13.01",
+    "fn": "CharTokenizer.__init__",
+    "kind": "body",
+    "key": null,
+    "hint": "校验词表、复制 id_to_token、用 enumerate 建立反向字典；接口见教程 13"
+  },
+  {
+    "file": "data_pipeline/tokenizer.py",
+    "id": "13.02",
+    "fn": "CharTokenizer.from_text",
+    "kind": "body",
+    "key": null,
+    "hint": "只用训练文本；sorted(set(text))；前置 <unk>，然后 cls(tokens)"
+  },
+  {
+    "file": "data_pipeline/tokenizer.py",
+    "id": "13.03",
+    "fn": "CharTokenizer.encode",
+    "kind": "body",
+    "key": null,
+    "hint": "逐字符查字典 get(character,unk_id)，返回 list[int]"
+  },
+  {
+    "file": "data_pipeline/tokenizer.py",
+    "id": "13.04",
+    "fn": "CharTokenizer.decode",
+    "kind": "body",
+    "key": null,
+    "hint": "验证编号为合法 Python int，按顺序查表，用空字符串连接"
+  },
+  {
+    "file": "data_pipeline/tokenizer.py",
+    "id": "13.05",
+    "fn": "CharTokenizer.save",
+    "kind": "body",
+    "key": null,
+    "hint": "保存 type/version/tokens 到 UTF-8 JSON，保留编号顺序"
+  },
+  {
+    "file": "data_pipeline/tokenizer.py",
+    "id": "13.06",
+    "fn": "CharTokenizer.load",
+    "kind": "body",
+    "key": null,
+    "hint": "读取 JSON，校验格式，再用原顺序 tokens 重建实例"
+  },
+  {
+    "file": "training/device.py",
+    "id": "14.01",
+    "fn": "resolve_device",
+    "kind": "body",
+    "key": null,
+    "hint": "auto 依次检查 CUDA/MPS/CPU；显式设备需校验可用性与编号"
+  },
+  {
+    "file": "training/device.py",
+    "id": "14.02",
+    "fn": "model_device",
+    "kind": "return",
+    "key": "next(model.parameters()).device",
+    "hint": "读取第一个模型参数的 device；本项目单设备"
+  },
+  {
+    "file": "training/device.py",
+    "id": "14.03",
+    "fn": "move_batch",
+    "kind": "return",
+    "key": "(x.to(device), y.to(device))",
+    "hint": "仅搬当前 batch，保持 long 类型"
+  },
+  {
+    "file": "data_pipeline/tinystories.py",
+    "id": "15.01",
+    "fn": "iter_stories",
+    "kind": "body",
+    "key": null,
+    "hint": "按独占一行的 EOS 切分；保留内部换行；跳过空故事；处理尾故事；limit 正数或 None"
+  },
+  {
+    "file": "data_pipeline/tinystories.py",
+    "id": "15.02",
+    "fn": "train_bpe",
+    "kind": "body",
+    "key": null,
+    "hint": "使用 ByteLevel+BPE，完整字节初始表和 EOS；只从训练集流式训练；返回 tokenizer,count"
+  },
+  {
+    "file": "scripts/prepare_tinystories.py",
+    "id": "16.01",
+    "fn": "encode_split",
+    "kind": "body",
+    "key": null,
+    "hint": "批量编码故事，每篇追加 EOS，写 uint16 临时文件；校验编号/大小/EOS 后替换并返回元数据；详见教程 16"
+  },
+  {
+    "file": "training/binary_data.py",
+    "id": "16.02",
+    "fn": "BinaryTokenDataset.__len__",
+    "kind": "return",
+    "key": "(self.token_count - 1) // self.seq_len",
+    "hint": "固定步长 T，需要 T+1 个 token，尾部不足一组舍弃"
+  },
+  {
+    "file": "training/binary_data.py",
+    "id": "16.03",
+    "fn": "BinaryTokenDataset.__getitem__",
+    "kind": "assign",
+    "key": "start",
+    "hint": "起点 index*T"
+  },
+  {
+    "file": "training/binary_data.py",
+    "id": "16.04",
+    "fn": "BinaryTokenDataset.__getitem__",
+    "kind": "assign",
+    "key": "chunk",
+    "hint": "取 T+1 个 token，转换 int64 再转 torch Tensor"
+  },
+  {
+    "file": "training/binary_data.py",
+    "id": "16.05",
+    "fn": "BinaryTokenDataset.__getitem__",
+    "kind": "return",
+    "key": "(chunk[:-1], chunk[1:])",
+    "hint": "返回错开一位的 x/y"
+  },
+  {
+    "file": "training/run_checkpoints.py",
+    "id": "17.01",
+    "fn": "save_run_checkpoint",
+    "kind": "body",
+    "key": null,
+    "hint": "保存历史文件；改善时原子更新 best；原子更新 latest；只删除超出 keep 的历史文件"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.01",
+    "fn": "main",
+    "kind": "assign",
+    "key": "checkpoint",
+    "hint": "读取 checkpoint 到 CPU"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.02",
+    "fn": "main",
+    "kind": "assign",
+    "key": "cfg",
+    "hint": "用保存的 model_config 重建 GPTConfig"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.03",
+    "fn": "main",
+    "kind": "assign",
+    "key": "model",
+    "hint": "用 cfg 创建 GPT，随后恢复参数"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.04",
+    "fn": "main",
+    "kind": "assign",
+    "key": "ids",
+    "hint": "tokenizer.encode(prompt)，不添加额外特殊 token"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.05",
+    "fn": "main",
+    "kind": "assign",
+    "key": "context",
+    "hint": "每次仅保留最近 max_len 个 token"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.06",
+    "fn": "main",
+    "kind": "assign",
+    "key": "logits",
+    "hint": "取最后一个位置的分数，得到 [1,V]"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.07",
+    "fn": "main",
+    "kind": "assign",
+    "key": "logits#2",
+    "hint": "采样时除以 temperature"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.08",
+    "fn": "main",
+    "kind": "assign",
+    "key": "values, indices",
+    "hint": "topk 筛选候选，最多 V 个"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.09",
+    "fn": "main",
+    "kind": "assign",
+    "key": "selected",
+    "hint": "softmax 后 multinomial 抽取一个候选索引"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.10",
+    "fn": "main",
+    "kind": "assign",
+    "key": "next_id",
+    "hint": "把候选索引映射回实际词表编号"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.11",
+    "fn": "main",
+    "kind": "assign",
+    "key": "next_id#2",
+    "hint": "top_k=0 时对完整词表采样"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.12",
+    "fn": "main",
+    "kind": "assign",
+    "key": "next_id#3",
+    "hint": "贪心时取 argmax 并保留 [1,1]"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.13",
+    "fn": "main",
+    "kind": "assign",
+    "key": "input_ids#2",
+    "hint": "沿序列轴拼接新 token"
+  },
+  {
+    "file": "scripts/generate_tinystories.py",
+    "id": "18.14",
+    "fn": "main",
+    "kind": "expr",
+    "key": "model.load_state_dict(checkpoint[\"model\"])",
+    "hint": "恢复训练好的参数，不能直接使用随机模型"
+  }
+]
